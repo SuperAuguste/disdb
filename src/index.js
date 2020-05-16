@@ -5,7 +5,7 @@ const path = require("path");
 const express = require("express");
 const Discord = require("discord.js");
 
-var random_garbage;
+let random_garbage;
 const app = express();
 
 const client = new Discord.Client();
@@ -16,7 +16,6 @@ client.on("ready", () => {
 
 	for (const guild of client.guilds.cache.array()) {
 		random_garbage = guild.channels.cache.array().find(_ => _.name == "random-garbage");
-		// console.log();
 	}
 
 });
@@ -42,6 +41,22 @@ function assert (cond, err) {
 	}
 }
 
+function uploadBuffer (name, buffer) {
+	let i = 0;
+	const chonks = chunks(buffer, 8388119);
+	const random = Math.random().toString(36).replace("0.", "");
+
+	for (const chunk of chonks) {
+		message.channel.send(`${name}_${random}, part ${i + 1}`, {
+			files: [
+				chunk
+			]
+		});
+
+		i++;
+	}
+}
+
 client.on("message", async message => {
 
 	if (message.content === "/delete") {
@@ -53,22 +68,20 @@ client.on("message", async message => {
 
 		message.reply("I oblige, master.");
 	} else if (message.content === "/upload_test") {
-		var i = 0;
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
-		const chonks = chunks(file_data, 8388119);
-		const random = Math.random().toString(36).replace("0.", "");
-
-		for (const chunk of chonks) {
-			message.channel.send(`inkscape.exe_${random}, part ${i + 1}`, {
-				files: [
-					chunk
-				]
-			});
-
-			i++;
-		}
+		uploadBuffer("inkscape.exe (Windows)", file_data);
 	}
 
 });
 
+app.get("/", (req, res) => {
+
+	// res.json({
+		// res: 
+	// });
+
+});
+
 client.login(process.env.TOKEN);
+
+app.listen(8080);
