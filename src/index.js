@@ -105,18 +105,13 @@ app.get("/download/:file", async (req, res) => {
 	let arrthingy = [];
 	for (const cmessage of messages) {
 		if (cmessage.content.startsWith("UPLOAD") && cmessage.content.includes(filename)) {
-			// const r = cmessage.content.match(/\d+ \/ /g)[0];
-			// console.log(r[r.length - 3]);
 			let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g)[0]);
-			// console.log(cmessage.attachments.array()[0].attachment);
-			const response = await axios.get(cmessage.attachments.array()[0].attachment);
-			arrthingy.push([response.data, partnumber]);
+			arrthingy[partnumber - 1] = axios.get(cmessage.attachments.array()[0].attachment, {
+				responseType: "arraybuffer"
+			});
 		}
 	}
-	arrthingy = arrthingy.sort((a, b) => { return b[1]-a[1]; });
-	arrthingy = arrthingy.map((a) => a[0]);
-	var buf = Buffer.concat(arrthingy);
-	// console.log(bf)
+	var buf = Buffer.concat((await Promise.all(arrthingy)).map(_ => _.data));
 	res.send(buf);
 
 });
