@@ -78,22 +78,34 @@ client.on("message", async (message) => {
     const messages = (await channel.messages.fetch()).array();
 
     let names = new Set();
-    for (const m of messages) {
-      const { author, content } = m;
+    while (messages.length > 0) {
+      const { author, content } = messages.pop();
       if (content.indexOf("-- INTERRUPT --") > -1) break;
       // :^)
-      if (author === "DiscordDB" && content.indexOf("UPLOAD") > -1) {
-        const splitMsg = content.split("part")[1].split(",");
-        const fileName = splitMsg.split("UPLOAD ")[1];
-        const partStrings = splitMsg[1].split("/").map((s) => s.trim());
-        const partNo = partStrings[0];
-        const totalParts = partStrings[1].split(" ")[0];
-        if (partNo === totalParts) names.add(fileName);
+      if (author.bot && content.indexOf("UPLOAD") > -1) {
+        const { filename, partNo, totalParts } = parseMessageContent(content);
+        console.log(filename, partNo, totalParts);
+        if (partNo === totalParts) names.add(filename);
       }
     }
-    message.reply([...names].join(","));
+    names.size
+      ? message.reply([...names].join(","))
+      : message.reply("Unable to find any completely uploaded files!");
   }
 });
+
+const parseMessageContent = (content) => {
+  const splitMsg = content.split(",");
+  const filename = splitMsg[0].split("UPLOAD ")[1];
+  const partStrings = splitMsg[1].split("/").map((s) => s.trim());
+  const partNo = partStrings[0];
+  const totalParts = partStrings[1].split(" ")[0];
+  return {
+    filename,
+    partNo,
+    totalParts,
+  };
+};
 
 app.get("/", (req, res) => {
   res.render("upload.ejs", {});
