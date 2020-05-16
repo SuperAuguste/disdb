@@ -119,10 +119,10 @@ const listFiles = async (channel = random_garbage, message) => {
     }
   }
   if (message) {
-	names.size
+		names.size
     	? message.reply([...names].join("\n"))
     	: message.reply("Unable to find any completely uploaded files!");
-  } else return [...names];
+  } else return [...names].map((name) => "https://disdb.herokuapp.com/download/" + name);
 };
 
 const parseMessageContent = (content) => {
