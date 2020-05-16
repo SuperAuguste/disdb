@@ -76,7 +76,7 @@ client.on("message", async message => {
 
 app.get("/", (req, res) => {
 
-	res.write("")
+	res.render("upload.ejs", {});
 
 });
 
