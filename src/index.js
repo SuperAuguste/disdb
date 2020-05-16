@@ -10,8 +10,6 @@ const app = express();
 
 const client = new Discord.Client();
 
-const apple = require('app.js');
-
 client.on("ready", () => {
 	
 	console.log("Ready!");
