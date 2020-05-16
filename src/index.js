@@ -75,7 +75,11 @@ client.on("message", async (message) => {
     );
     uploadBuffer(message.channel, "UPLOAD inkscape.exe (Windows)", file_data);
   } else if (content === "/list") {
-    const messages = (await channel.messages.fetch()).array();
+    listFiles(messages);
+});
+
+const listFiles = message => {
+	const messages = (await channel.messages.fetch()).array();
 
     let names = new Set();
     while (messages.length > 0) {
@@ -91,8 +95,7 @@ client.on("message", async (message) => {
     names.size
       ? message.reply([...names].join(","))
       : message.reply("Unable to find any completely uploaded files!");
-  }
-});
+}
 
 const parseMessageContent = (content) => {
   const splitMsg = content.split(",");
