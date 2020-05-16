@@ -1,0 +1,9 @@
+{
+  "name": "disdb",
+  "version": "1.0.0",
+  "description": "Database that uses Discord text channels. Is it a violation of ToS, I guess we'll find out!",
+  "main": "src/index.js",
+  "author": "SuperAuguste <auguste.rame@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
