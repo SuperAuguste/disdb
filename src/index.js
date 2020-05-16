@@ -12,6 +12,7 @@ const Discord = require("discord.js");
 let random_garbage;
 const app = express();
 
+app.use(express.static("/static"));
 app.use(require("express-fileupload")());
 
 const client = new Discord.Client();
@@ -125,7 +126,7 @@ const parseMessageContent = (content) => {
 };
 
 app.get("/", (req, res) => {
-  res.render("upload.ejs", {});
+  res.render("index.ejs", {listFiles});
 });
 
 app.post("/upload", async (req, res) => {

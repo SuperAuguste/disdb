@@ -4,18 +4,22 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Upload</title>
+
+	<link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
 	
 	<h1>Upload</h1>
+
+	<p>Upload files to Discord below! Please .</p>
 
 	<form ref='uploadForm' 
 	id='uploadForm' 
 	action='/upload' 
 	method='post' 
 	encType="multipart/form-data">
-		<input type="file" name="foo" />
-		<input type='submit' value='Upload!' />
+		<input type="file" name="foo">
+		<input type='submit' value='Upload!'>
 	</form>
 
 </body>
