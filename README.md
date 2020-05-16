@@ -2,9 +2,14 @@
 
 Storing data on Discord!
 
+## .env
+
+```
+TOKEN=<YOUR_TOKEN>
+PORT=8080
+```
+
 ## Heroku
 
 - Set up a heroku app
-- In the 'Settings / Config Vars' tab in heroku:
-  - Set the port numbers
-  - Set the token var
+- `heroku config:set TOKEN=<YOUR_TOKEN>`
