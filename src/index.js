@@ -144,9 +144,7 @@ app.get("/", async (req, res) => {
 
 app.post("/upload", async (req, res) => {
   await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
-  res.json({
-    success: "yay!",
-  });
+  res.redirect("/");
 });
 
 app.get("/download/:file", async (req, res) => {
