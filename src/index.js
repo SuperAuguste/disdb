@@ -41,7 +41,7 @@ function assert (cond, err) {
 	}
 }
 
-function uploadBuffer (name, buffer) {
+function uploadBuffer (channel, name, buffer) {
 	let i = 0;
 	const chonks = chunks(buffer, 8388119);
 	const random = Math.random().toString(36).replace("0.", "");
@@ -69,16 +69,14 @@ client.on("message", async message => {
 		message.reply("I oblige, master.");
 	} else if (message.content === "/upload_test") {
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
-		uploadBuffer("inkscape.exe (Windows)", file_data);
+		uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
 	}
 
 });
 
 app.get("/", (req, res) => {
 
-	// res.json({
-		// res: 
-	// });
+	res.write("")
 
 });
 
