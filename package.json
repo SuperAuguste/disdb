@@ -19,5 +19,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
-  }
+  },
+  "start": "node src/index.js",
+	"engines": {
+		"node": "12.16.x"
+	}
 }
