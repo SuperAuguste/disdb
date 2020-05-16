@@ -5,22 +5,44 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Upload</title>
 
-	<link rel="stylesheet" href="/static/app.css">
+	<link rel="stylesheet" href="/app.css">
 </head>
 <body>
 	
-	<h1>Upload</h1>
+	<main>
 
-	<p>Upload files to Discord below! Please .</p>
+		<div id="list">
 
-	<form ref='uploadForm' 
-	id='uploadForm' 
-	action='/upload' 
-	method='post' 
-	encType="multipart/form-data">
-		<input type="file" name="foo">
-		<input type='submit' value='Upload!'>
-	</form>
+			<h1>Files</h1>
+			
+			<div id="files">
+			<% for (const file of files) { %>
+	
+				<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;">(<%- file.split("_").slice(-1) %>)</span></div>
+	
+			<% } %>
+			</div>
+	
+		</div>
+	
+		<div id="upload">
+	
+			<h1>Upload</h1>
+	
+			<p>Upload files to Discord below! Please .</p>
+	
+			<form ref='uploadForm' 
+			id='uploadForm' 
+			action='/upload' 
+			method='post' 
+			encType="multipart/form-data">
+				<input type="file" name="foo">
+				<input type='submit' value='Upload!'>
+			</form>
+	
+		</div>
+
+	</main>
 
 </body>
 </html>

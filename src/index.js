@@ -12,7 +12,7 @@ const Discord = require("discord.js");
 let random_garbage;
 const app = express();
 
-app.use(express.static("/static"));
+app.use(express.static("static"));
 app.use(require("express-fileupload")());
 
 const client = new Discord.Client();
@@ -94,22 +94,35 @@ client.on("message", async (message) => {
   }
 });
 
-const listFiles = async (channel, message) => {
-  const messages = (await channel.messages.fetch()).array();
+const listFiles = async (channel = random_garbage, message) => {
+  let messages = (await channel.messages.fetch()).array();
   let names = new Set();
-  for (const m of messages) {
-	const { author, content } = m;
+  let i = 0;
+  while (i < messages.length) {
+    const m = messages[i];
+	  const { author, content } = m;
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
 	  if (partNo === totalParts) names.add(filename);
+    }
+
+    i++;
+
+    // console.log(m);
+
+    if (i === messages.length) {
+      i = 0;
+      messages = (await channel.messages.fetch({
+        before: m.id
+      })).array();
     }
   }
   if (message) {
 	names.size
     	? message.reply([...names].join("\n"))
     	: message.reply("Unable to find any completely uploaded files!");
-  }
+  } else return [...names];
 };
 
 const parseMessageContent = (content) => {
@@ -125,8 +138,8 @@ const parseMessageContent = (content) => {
   };
 };
 
-app.get("/", (req, res) => {
-  res.render("index.ejs", {listFiles});
+app.get("/", async (req, res) => {
+  res.render("index.ejs", {files: await listFiles()});
 });
 
 app.post("/upload", async (req, res) => {
@@ -137,11 +150,13 @@ app.post("/upload", async (req, res) => {
 });
 
 app.get("/download/:file", async (req, res) => {
-  const messages = (await random_garbage.messages.fetch()).array();
+  let messages = (await random_garbage.messages.fetch()).array();
   let filename = req.params.file;
 
+  let i = 0;
   let arrthingy = [];
-  for (const cmessage of messages) {
+  while (i < messages.length) {
+    const cmessage = messages[i];
     if (
       cmessage.content.startsWith("UPLOAD") &&
       cmessage.content.includes(filename)
@@ -154,6 +169,15 @@ app.get("/download/:file", async (req, res) => {
         }
       );
     }
+
+    i++;
+
+    if (i === messages.length) {
+      i = 0;
+      messages = (await random_garbage.messages.fetch({
+        before: cmessage.id
+      })).array();
+    }
   }
 
   if (arrthingy.length === 0)
@@ -162,7 +186,9 @@ app.get("/download/:file", async (req, res) => {
     });
 
   var buf = Buffer.concat((await Promise.all(arrthingy)).map((_) => _.data));
-  res.send(buf);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
+  res.write(buf);
+  res.end();
 });
 
 client.login(process.env.TOKEN);
