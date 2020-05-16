@@ -47,7 +47,7 @@ function uploadBuffer (channel, name, buffer) {
 	const random = Math.random().toString(36).replace("0.", "");
 
 	for (const chunk of chonks) {
-		message.channel.send(`${name}_${random}, part ${i + 1}`, {
+		channel.send(`${name}_${random}, part ${i + 1}`, {
 			files: [
 				chunk
 			]
