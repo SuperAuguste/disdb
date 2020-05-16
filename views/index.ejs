@@ -16,11 +16,11 @@
 			<h1>Files</h1>
 			
 			<div id="files">
-			<% for (const file of files) { %>
-	
-				<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;">(<%- file.split("_").slice(-1) %>)</span></div>
-	
-			<% } %>
+				<% for (const file of files) { %>
+		
+					<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;">(<%- file.split("_").slice(-1) %>)</span></div>
+		
+				<% } %>
 			</div>
 	
 		</div>
@@ -29,7 +29,7 @@
 	
 			<h1>Upload</h1>
 	
-			<p>Upload files to Discord below! Please .</p>
+			<p>Upload files to Discord below! Please make sure that the files don't contain any private info!</p>
 	
 			<form ref='uploadForm' 
 			id='uploadForm' 
