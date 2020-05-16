@@ -118,11 +118,12 @@ const listFiles = async (channel = random_garbage, message) => {
       })).array();
     }
   }
+	let namefn = (names) => names.map((name) => "https://disdb.herokuapp.com/download/" + name).join("\n");
   if (message) {
-	names.size
-    	? message.reply([...names].join("\n"))
+		names.size
+    	? message.reply(namefn([...names]))
     	: message.reply("Unable to find any completely uploaded files!");
-  } else return [...names];
+  } else return namefn([...names]);
 };
 
 const parseMessageContent = (content) => {
@@ -144,12 +145,10 @@ app.get("/", async (req, res) => {
 
 app.post("/upload", async (req, res) => {
   await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
-  res.json({
-    success: "yay!",
-  });
+  res.redirect("/");
 });
 
-app.get("/download/:file", async (req, res) => {
+const download = async (req, res) => {
   let messages = (await random_garbage.messages.fetch()).array();
   let filename = req.params.file;
 
@@ -189,7 +188,10 @@ app.get("/download/:file", async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
   res.write(buf);
   res.end();
-});
+};
+
+app.get("/download/:file", download);
+app.get("/preview/:file.*", download);
 
 client.login(process.env.TOKEN);
 
