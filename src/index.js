@@ -69,7 +69,7 @@ client.on("message", async message => {
 		message.reply("I oblige, master.");
 	} else if (message.content === "/upload_test") {
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
-		uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
+		uploadBuffer(message.channel, "UPLOAD inkscape.exe (Windows)", file_data);
 	}
 
 });
