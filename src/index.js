@@ -166,4 +166,4 @@ app.get("/download/:file", async (req, res) => {
 
 client.login(process.env.TOKEN);
 
-app.listen(8080);
+app.listen(process.env.PORT);
