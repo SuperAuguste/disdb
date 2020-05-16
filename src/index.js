@@ -99,16 +99,16 @@ const listFiles = async (channel, message) => {
   while (messages.length > 0) {
     const { author, content } = messages.pop();
     if (content.indexOf("-- INTERRUPT --") > -1) break;
-    // :^)
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
-      console.log(filename, partNo, totalParts);
       if (partNo === totalParts) names.add(filename);
     }
   }
-  message && names.size
-    ? message.reply([...names].join(","))
-    : message.reply("Unable to find any completely uploaded files!");
+  if (message) {
+	names.size
+    	? message.reply([...names].join(","))
+    	: message.reply("Unable to find any completely uploaded files!");
+  }
 };
 
 const parseMessageContent = (content) => {
