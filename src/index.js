@@ -70,8 +70,21 @@ client.on("message", async message => {
 	} else if (message.content === "/upload_test") {
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
 		uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
-	}
+	} else if (message.content.startsWith("/download")) {
+		const messages = (await message.channel.messages.fetch()).array();
+		let filename = message.content.substring(("/download").length);
 
+		let arrthingy = [];
+		for (const cmessage of messages) {
+			if (cmessage.content.startsWith("UPLOAD") && cmessage.content.includes(filename)) {
+				let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g).pop().pop().pop());
+				arrthingy.push([cmessage.attachments.array()[0].attachment, partnumber]);
+			}
+		}
+		arrthingy.sort((a, b) => { return b[1]-a[1]; });
+		arrthingy.map((a) => Buffer.from(a[0]));
+		var buf = Buffer.concat(arr);
+	}
 });
 
 app.get("/", (req, res) => {
