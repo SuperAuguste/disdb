@@ -2,11 +2,24 @@ require("dotenv").config();
 
 const fs = require("fs");
 const path = require("path");
+const express = require("express");
 const Discord = require("discord.js");
+
+var random_garbage;
+const app = express();
 
 const client = new Discord.Client();
 
-client.on("ready", () => {console.log("Ready!")});
+client.on("ready", () => {
+	
+	console.log("Ready!");
+
+	for (const guild of client.guilds.cache.array()) {
+		random_garbage = guild.channels.cache.array().find(_ => _.name == "random-garbage");
+		// console.log();
+	}
+
+});
 
 function chunks (buffer, chunkSize) {
 	assert(Buffer.isBuffer(buffer),           'Buffer is required');
@@ -43,9 +56,10 @@ client.on("message", async message => {
 		var i = 0;
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
 		const chonks = chunks(file_data, 8388119);
+		const random = Math.random().toString(36).replace("0.", "");
 
 		for (const chunk of chonks) {
-			message.channel.send(`inkscape.exe, part ${i + 1}`, {
+			message.channel.send(`inkscape.exe_${random}, part ${i + 1}`, {
 				files: [
 					chunk
 				]
