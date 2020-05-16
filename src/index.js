@@ -123,7 +123,7 @@ const listFiles = async (channel = random_garbage, message) => {
 		names.size
     	? message.reply(namefn([...names]))
     	: message.reply("Unable to find any completely uploaded files!");
-  } else return namefn([...names]);
+  } else return [...names];
 };
 
 const parseMessageContent = (content) => {
