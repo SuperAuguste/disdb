@@ -111,6 +111,12 @@ app.get("/download/:file", async (req, res) => {
 			});
 		}
 	}
+	
+	if (arrthingy.length === 0)
+		return res.json({
+			"error": "Could not find file."
+		});
+
 	var buf = Buffer.concat((await Promise.all(arrthingy)).map(_ => _.data));
 	res.send(buf);
 
