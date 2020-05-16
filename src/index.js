@@ -18,7 +18,7 @@ app.use(require("express-fileupload")());
 const client = new Discord.Client();
 
 client.on("ready", () => {
-  console.log("Ready!");
+  console.log(`Ready on port ${process.env.PORT}`);
 
   for (const guild of client.guilds.cache.array()) {
     random_garbage = guild.channels.cache
@@ -193,4 +193,4 @@ app.get("/download/:file", async (req, res) => {
 
 client.login(process.env.TOKEN);
 
-app.listen(8080);
+app.listen(process.env.PORT);
