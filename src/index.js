@@ -77,10 +77,10 @@ client.on("message", async (message) => {
   } else if (content === "/list") {
     const messages = (await channel.messages.fetch()).array();
 
-    let names = [];
+    let names = new Set();
     for (const m of messages) {
       const { author, content } = m;
-      if (m.indexOf("-- INTERRUPT --") > -1) break;
+      if (content.indexOf("-- INTERRUPT --") > -1) break;
       // :^)
       if (author === "DiscordDB" && content.indexOf("UPLOAD") > -1) {
         const splitMsg = content.split("part")[1].split(",");
@@ -88,10 +88,10 @@ client.on("message", async (message) => {
         const partStrings = splitMsg[1].split("/").map((s) => s.trim());
         const partNo = partStrings[0];
         const totalParts = partStrings[1].split(" ")[0];
-        if (partNo === totalParts) names.push(fileName);
+        if (partNo === totalParts) names.add(fileName);
       }
     }
-    message.reply(names.join(","));
+    message.reply([...names].join(","));
   }
 });
 
