@@ -145,22 +145,22 @@ app.get("/download/:file", async (req, res) => {
       cmessage.content.startsWith("UPLOAD") &&
       cmessage.content.includes(filename)
     ) {
-      // const r = cmessage.content.match(/\d+ \/ /g)[0];
-      // console.log(r[r.length - 3]);
       let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g)[0]);
-      // console.log(cmessage.attachments.array()[0].attachment);
-      const response = await axios.get(
-        cmessage.attachments.array()[0].attachment
+      arrthingy[partnumber - 1] = axios.get(
+        cmessage.attachments.array()[0].attachment,
+        {
+          responseType: "arraybuffer",
+        }
       );
-      arrthingy.push([response.data, partnumber]);
     }
   }
-  arrthingy = arrthingy.sort((a, b) => {
-    return b[1] - a[1];
-  });
-  arrthingy = arrthingy.map((a) => a[0]);
-  var buf = Buffer.concat(arrthingy);
-  // console.log(bf)
+
+  if (arrthingy.length === 0)
+    return res.json({
+      error: "Could not find file.",
+    });
+
+  var buf = Buffer.concat((await Promise.all(arrthingy)).map((_) => _.data));
   res.send(buf);
 });
 
