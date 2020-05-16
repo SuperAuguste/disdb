@@ -2,9 +2,13 @@ require("dotenv").config();
 
 const fs = require("fs");
 const path = require("path");
+const axios = require("axios").default;
 const express = require("express");
 const Discord = require("discord.js");
 
+/**
+ * @type {Discord.TextChannel}
+ */
 let random_garbage;
 const app = express();
 
@@ -48,15 +52,18 @@ function uploadBuffer (channel, name, buffer) {
 	const chonks = chunks(buffer, 8388119);
 	const random = Math.random().toString(36).replace("0.", "");
 
+	const a = [];
 	for (const chunk of chonks) {
-		channel.send(`UPLOAD ${name}_${random}, part ${i + 1} / ${chonks.length} (${chonks.length - i - 1} seconds remaining)`, {
+		a.push(channel.send(`UPLOAD ${name}_${random}, part ${i + 1} / ${chonks.length} (${chonks.length - i - 1} seconds remaining)`, {
 			files: [
 				chunk
 			]
-		});
+		}));
 
 		i++;
 	}
+
+	return Promise.all(a);
 }
 
 client.on("message", async message => {
@@ -72,20 +79,6 @@ client.on("message", async message => {
 	} else if (message.content === "/upload_test") {
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
 		uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
-	} else if (message.content.startsWith("/download")) {
-		const messages = (await message.channel.messages.fetch()).array();
-		let filename = message.content.substring(("/download").length);
-
-		let arrthingy = [];
-		for (const cmessage of messages) {
-			if (cmessage.content.startsWith("UPLOAD") && cmessage.content.includes(filename)) {
-				let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g).pop().pop().pop());
-				arrthingy.push([cmessage.attachments.array()[0].attachment, partnumber]);
-			}
-		}
-		arrthingy.sort((a, b) => { return b[1]-a[1]; });
-		arrthingy.map((a) => Buffer.from(a[0]));
-		var buf = Buffer.concat(arr);
 	}
 });
 
@@ -95,9 +88,36 @@ app.get("/", (req, res) => {
 
 });
 
-app.post("/upload", (req, res) => {
+app.post("/upload", async (req, res) => {
 
-	uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
+	await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
+	res.json({
+		"success": "yay!"
+	});
+
+});
+
+app.get("/download/:file", async (req, res) => {
+
+	const messages = (await random_garbage.messages.fetch()).array();
+	let filename = req.params.file;
+
+	let arrthingy = [];
+	for (const cmessage of messages) {
+		if (cmessage.content.startsWith("UPLOAD") && cmessage.content.includes(filename)) {
+			// const r = cmessage.content.match(/\d+ \/ /g)[0];
+			// console.log(r[r.length - 3]);
+			let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g)[0]);
+			// console.log(cmessage.attachments.array()[0].attachment);
+			const response = await axios.get(cmessage.attachments.array()[0].attachment);
+			arrthingy.push([response.data, partnumber]);
+		}
+	}
+	arrthingy = arrthingy.sort((a, b) => { return b[1]-a[1]; });
+	arrthingy = arrthingy.map((a) => a[0]);
+	var buf = Buffer.concat(arrthingy);
+	// console.log(bf)
+	res.send(buf);
 
 });
 
