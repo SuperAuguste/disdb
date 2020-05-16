@@ -5,4 +5,6 @@ Storing data on Discord!
 ## Heroku
 
 - Set up a heroku app
-- Add config variable to the 'Settings / Config Vars' tab in heroku.
+- In the 'Settings / Config Vars' tab in heroku:
+  - Set the port numbers
+  - Set the token var

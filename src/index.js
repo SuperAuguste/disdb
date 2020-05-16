@@ -17,7 +17,7 @@ app.use(require("express-fileupload")());
 const client = new Discord.Client();
 
 client.on("ready", () => {
-  console.log("Ready!");
+  console.log(`Ready on port ${process.env.PORT}`);
 
   for (const guild of client.guilds.cache.array()) {
     random_garbage = guild.channels.cache
