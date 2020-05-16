@@ -8,6 +8,8 @@ const Discord = require("discord.js");
 let random_garbage;
 const app = express();
 
+app.use(require("express-fileupload")());
+
 const client = new Discord.Client();
 
 client.on("ready", () => {
@@ -47,7 +49,7 @@ function uploadBuffer (channel, name, buffer) {
 	const random = Math.random().toString(36).replace("0.", "");
 
 	for (const chunk of chonks) {
-		channel.send(`${name}_${random}, part ${i + 1}`, {
+		channel.send(`UPLOAD ${name}_${random}, part ${i + 1} / ${chonks.length} (${chonks.length - i - 1} seconds remaining)`, {
 			files: [
 				chunk
 			]
@@ -61,7 +63,7 @@ client.on("message", async message => {
 
 	if (message.content === "/delete") {
 		const messages = (await message.channel.messages.fetch()).array();
-
+		
 		for (const cmessage of messages) {
 			if (cmessage.deletable) cmessage.delete();
 		}
@@ -69,7 +71,7 @@ client.on("message", async message => {
 		message.reply("I oblige, master.");
 	} else if (message.content === "/upload_test") {
 		const file_data = fs.readFileSync(path.join(__dirname, "..", "test", "inkscape.exe"));
-		uploadBuffer(message.channel, "UPLOAD inkscape.exe (Windows)", file_data);
+		uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
 	}
 
 });
@@ -77,6 +79,12 @@ client.on("message", async message => {
 app.get("/", (req, res) => {
 
 	res.render("upload.ejs", {});
+
+});
+
+app.post("/upload", (req, res) => {
+
+	uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
 
 });
 
