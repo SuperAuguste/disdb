@@ -6,6 +6,8 @@ const Discord = require("discord.js");
 
 const client = new Discord.Client();
 
+const apple = require('app.js');
+
 client.on("ready", () => {console.log("Ready!")});
 
 function chunks (buffer, chunkSize) {
