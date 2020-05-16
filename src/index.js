@@ -147,7 +147,7 @@ app.post("/upload", async (req, res) => {
   res.redirect("/");
 });
 
-app.get("/download/:file", async (req, res) => {
+const download = async (req, res) => {
   let messages = (await random_garbage.messages.fetch()).array();
   let filename = req.params.file;
 
@@ -187,7 +187,10 @@ app.get("/download/:file", async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
   res.write(buf);
   res.end();
-});
+};
+
+app.get("/download/:file", download);
+app.get("/preview/:file.*", download);
 
 client.login(process.env.TOKEN);
 
