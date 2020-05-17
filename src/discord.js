@@ -10,7 +10,7 @@ const path = require("path");
  */
 const Discord = require("discord.js");
 const { Readable } = require("stream");
-const { encodeWav } = require("wav-converter");
+const { encodeWav: encodeWavHelper } = require("wav-converter");
 const peer = require("./peer");
 
 const {
@@ -114,6 +114,16 @@ class Silence extends Readable {
     this.destroy();
   }
 }
+
+/**
+ * @param {Buffer} Buffer
+ * @returns {Buffer}
+ */
+const encodeWav = buffer => encodeWavHelper(buffer, {
+  numChannels: 2,
+  sampleRate: 48000,
+  byteRate: 16
+});
 
 const userRequestMap = {};
 
