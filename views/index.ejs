@@ -112,23 +112,23 @@
       });
 
       document.addEventListener("dragover", () => {
-        document.getElementById("foo").classList.add("drag");
+        document.getElementById("fileList").classList.add("drag");
       });
 
       document.addEventListener("dragend", () => {
-        document.getElementById("foo").classList.remove("drag");
+        document.getElementById("fileList").classList.remove("drag");
       });
 
       document.addEventListener("dragleave", (event) => {
         if (cooldown) clearTimeout(cooldown);
         cooldown = setTimeout(() => {
-          document.getElementById("foo").classList.remove("drag");
+          document.getElementById("fileList").classList.remove("drag");
           cooldown = undefined;
         }, 1000);
       });
 
       document.addEventListener("drop", () => {
-        document.getElementById("foo").classList.remove("drag");
+        document.getElementById("fileList").classList.remove("drag");
       });
     </script>
   </body>
