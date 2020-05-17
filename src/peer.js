@@ -44,14 +44,17 @@ swarm.on("connection",
           {
             files: [Buffer.concat(buffer_array)],
           }
-        )
+        );
         mode = "normal";
+        buffer_array = [];
+        console.log("Normal!!!");
       }
       return;
     }
 
 		try {
-			const message = JSON.parse(data.toString());
+      const message = JSON.parse(data.toString());
+      console.log(message);
 
 			switch (message.type) {
 				case "hello":
