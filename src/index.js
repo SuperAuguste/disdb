@@ -90,40 +90,44 @@ client.on("message", async (message) => {
     );
     uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
   } else if (message.content === "/list") {
-    listFiles(message.channel, message);
+	linkFiles(message.channel, message);
   }
 });
 
-const listFiles = async (channel = random_garbage, message) => {
+const linkFiles = async (channel, message) => {
+	const fileNames = await listFiles(channel, message);
+	const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+	const embedded = new Discord.MessageEmbed();
+	embedded.description = fileNames.length 
+		? fileNames
+			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}/download/${n.replace(/ /g, "%20")})`)
+			.join("\n")
+		: "Unable to find any uploaded files!";
+	message.reply(embedded);
+}
+
+const listFiles = async (channel = random_garbage) => {
   let messages = (await channel.messages.fetch()).array();
   let names = new Set();
   let i = 0;
   while (i < messages.length) {
-    const m = messages[i];
-	  const { author, content } = m;
+	const { author, content, id } = messages[i];
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
 	  if (partNo === totalParts) names.add(filename);
     }
 
-    i++;
-
-    // console.log(m);
-
+	i++;
+	
     if (i === messages.length) {
       i = 0;
       messages = (await channel.messages.fetch({
-        before: m.id
+        before: id
       })).array();
     }
   }
-	let namefn = (names) => names.map((name) => "https://disdb.herokuapp.com/download/" + name).join("\n");
-  if (message) {
-		names.size
-    	? message.reply(namefn([...names]))
-    	: message.reply("Unable to find any completely uploaded files!");
-  } else return [...names];
+  return [...names];
 };
 
 const parseMessageContent = (content) => {
