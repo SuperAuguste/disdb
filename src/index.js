@@ -183,12 +183,26 @@ const recordAudio = async (user, channel = random_garbage) => {
 
 const linkFiles = async (channel, message) => {
 	const fileNames = await listFiles(channel, message);
-	const embedded = new Discord.MessageEmbed();
-	embedded.description = fileNames.length 
-		? fileNames
-			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}download/${encodeURIComponent(n)})`)
-			.join("\n")
-		: "Unable to find any uploaded files!";
+  let description;
+  if (fileNames.length) {
+    const fileLinks = fileNames.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}download/${encodeURIComponent(n)})`)
+    const descriptions = fileLinks.reduce((curr, l) => {
+      const last = curr.pop();
+      if (last.length + l.length + 1 >= 2048) {
+        curr.push(last, l);
+      } else {
+        curr.push(`${last}${last ? '\n' : ''}${l}`)
+      }
+      return curr;
+    }, ['']);
+    for (const description of descriptions) {
+      await message.reply(new Discord.MessageEmbed({description}))
+    }
+  } else {
+    message.reply(new Discord.MessageEmbed({description: "Unable to find any uploaded files!"}))
+  }
+  
+	embedded.description = description;
 	message.reply(embedded);
 }
 
@@ -201,7 +215,7 @@ const listFiles = async (channel = random_garbage) => {
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
-	  if (partNo === totalParts) names.add(filename);
+	    if (partNo === totalParts) names.add(filename);
     }
 
 	i++;
