@@ -49,18 +49,23 @@ swarm.on("connection",
 		console.log(data.toString());
 		const message = JSON.parse(data.toString());
 
-		switch (message.type) {
-			case "hello":
-        peer_id = message.peer_id;
-        console.log(`Connected to peer bot with peer id "${peer_id}"`);
-        peers.set(peer_id, {
-          connection
-        });
-        break;
-      case "upload":
-        upload_data = message;
-        mode = "upload";
-        break;
+		try {
+			switch (message.type) {
+				case "hello":
+    	    peer_id = message.peer_id;
+    	    console.log(`Connected to peer bot with peer id "${peer_id}"`);
+    	    peers.set(peer_id, {
+    	      connection
+    	    });
+    	    break;
+    	  case "upload":
+    	    upload_data = message;
+    	    mode = "upload";
+    	    break;
+			}
+		}
+		catch {
+			// do nothing
 		}
 
   });
