@@ -30,17 +30,15 @@ swarm.on("connection",
   let peer_id;
 
   let upload_data = {};
-  let uploaded_data = [];
+  let buffer_array = [];
 
   connection.on("data", (data, info) => {
 
     if (mode === "upload") {
-      // console.log(data);
-      // common.uploadBuffer(channel, upload_data.name, data, upload_data.uuid, upload_data.offset);
       uploaded_data.push(data);
-      console.log(uploaded_data.length, upload_data.length)
-      if (uploaded_data.length === upload_data.length) {
-        common.uploadBuffer(channel, upload_data.name, Buffer.concat(uploaded_data), upload_data.uuid, upload_data.offset, data.total_parts);
+      console.log(buffer_array.length, upload_data.length)
+      if (buffer_array.length === upload_data.length) {
+        common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_parts);
         mode = "normal";
       }
       return;
