@@ -18,7 +18,18 @@
 			<div id="files">
 				<% for (const file of files) { %>
 		
-					<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;"><a href="#" onclick="location.replace(`/stream_audio/${prompt('Channel name! (without #)')}/<%- encodeURIComponent(file) %>`);">Play</a> (<%- file.split("_").slice(-1) %>)</span></div>
+					<div>
+					
+						<span><%- file.split("_").slice(0, -1).join("") %></span> <span style="float: right;"> (<%- file.split("_").slice(-1) %>)</span>
+
+						<div class="controls">
+
+							<a href="#" onclick="location.replace(`/stream_audio/${prompt('Channel name! (without #)')}/<%- encodeURIComponent(file) %>`);">Play</a>
+							<a href="/download/<%- file %>">Download</a>
+
+						</div>
+
+					</div>
 		
 				<% } %>
 			</div>
