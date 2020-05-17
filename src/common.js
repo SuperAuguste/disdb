@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('discord.js').TextChannel} Discord.TextChannel
+ */
+
 const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
 
 function chunks(buffer, chunkSize) {
@@ -44,6 +48,9 @@ function uploadBuffer(
   const a = [];
   for (const chunk of chonks) {
     a.push(
+      /**
+       * @type {Discord.TextChannel}
+       */
       channel.send(
         `UPLOAD ${name}_${uuid}, part ${i + 1 + offset} / ${chonks.length} (${
           chonks.length - i - 1
@@ -89,7 +96,7 @@ const xss = (str) =>
 
 /**
  * Lists all valid files in a DisDB storage channel.
- * @param {Discord.TexChannel} channel 
+ * @param {Discord.TextChannel} channel 
  */
 const listFiles = async (channel) => {
   let messages = (await channel.messages.fetch()).array();
@@ -125,9 +132,10 @@ const listFiles = async (channel) => {
  * Deletes a file from the DisDB channel.
  * The filename must match a <NAME>.<EXTENSION>_<UUID> format.
  * @param {string} filename
- * @param {Discord.TexChannel} channel 
+ * @param {Discord.TextChannel} channel 
  */
 const deleteFile = async (reqFilename, channel) => {
+  console.log(reqFilename);
   let messages = (await channel.messages.fetch()).array();
   console.log("Deleting file...", reqFilename);
 
@@ -151,7 +159,7 @@ const deleteFile = async (reqFilename, channel) => {
 
 /**
  * Wipes all DisDB files from a discord channel.
- * @param {Discord.TexChannel} channel 
+ * @param {Discord.TextChannel} channel 
  */
 const deleteAllFiles = async (channel) => {
   const messages = (await channel.messages.fetch()).array();

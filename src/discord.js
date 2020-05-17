@@ -1,5 +1,13 @@
 const fs = require("fs");
 const path = require("path");
+
+/**
+ * @typedef {import('discord.js').Client} Discord.Client
+ * @typedef {import('discord.js').TextChannel} Discord.TextChannel
+ * @typedef {import('discord.js').User} Discord.User
+ * @typedef {import('discord.js').VoiceChannel} Discord.VoiceChannel
+ * @typedef {import('discord.js').MessageEmbed} Discord.MessageEmbed
+ */
 const Discord = require("discord.js");
 const { Readable } = require("stream");
 const merge = require("lodash.merge");
