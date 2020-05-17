@@ -58,6 +58,7 @@ main>*:last-child {
 	right: 0;
 	bottom: 0;
 	z-index:1;
+	pointer-events: none;
 }
 
 #dragOverlay {
@@ -67,11 +68,12 @@ main>*:last-child {
 	height: 100%;
 	width: 100%; background: transparent;
 	z-index: 2;
+	pointer-events: none;
 }
 
 body.dragenter #dragMessage {
 	display: block;
-	background: green;
+	background: '#158A2655';
 }
 
 .play {
