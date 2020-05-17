@@ -122,10 +122,16 @@ const deleteFile = async (reqFilename, channel) => {
   }
 };
 
+const deleteAllFiles = async (channel) => {
+  const messages = (await channel.messages.fetch()).array();
+  messages.forEach((m) => m.deletable && m.delete());
+};
+
 module.exports = {
   baseUrl,
   uploadBuffer,
   listFiles,
   parseMessageContent,
   deleteFile,
+  deleteAllFiles,
 };

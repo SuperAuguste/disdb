@@ -1,2 +1,3 @@
-src/index.js
-views/index.js
+src/*.js
+views/*
+static/*

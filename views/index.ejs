@@ -9,6 +9,7 @@
 
     <style id="dark"></style>
   </head>
+
   <body>
     <main>
       <div id="dragMessage">Drop a File to Upload</div>
@@ -51,8 +52,14 @@
               >
                 Play
               </button>
+              <button
+                href="#"
+                onclick="location.replace(`/show_preview/<%- encodeURIComponent(file) %>`);"
+              >
+                Show
+              </button>
               <button href="/download/<%- file %>">Download</button>
-              <a href="/delete/<%- file %>">Delete</a>
+              <button href="/delete/<%- file %>">Delete</button>
             </div>
           </div>
 
@@ -92,9 +99,9 @@
         const dark = document.getElementById("dark");
         if (!dark.innerHTML.length) {
           dark.innerHTML = `html, body {
-			color: rgb(190, 190, 190);
-			background-color: black;
-			}`;
+            color: rgb(190, 190, 190);
+            background-color: black;
+            }`;
           document.getElementById("toggle").style.backgroundColor = "white";
           document.getElementById("toggler").src = "sun.svg";
         } else {

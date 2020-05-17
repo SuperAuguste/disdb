@@ -4,7 +4,13 @@ const Discord = require("discord.js");
 const { Readable } = require("stream");
 const merge = require("lodash.merge");
 
-const { uploadBuffer, deleteFile, listFiles, baseUrl } = require("./common");
+const {
+  uploadBuffer,
+  deleteFile,
+  listFiles,
+  baseUrl,
+  deleteAllFiles,
+} = require("./common");
 
 const client = new Discord.Client();
 
@@ -64,7 +70,7 @@ const testUpload = async (channel) => {
 const handleDelete = async (arg, message, channel) => {
   switch (arg) {
     case undefined:
-      deleteAll(channel);
+      deleteAllFiles(channel);
       message.reply("Deleted all files, my sir.");
       break;
     default:
@@ -72,11 +78,6 @@ const handleDelete = async (arg, message, channel) => {
       message.reply(`Deleted (or tried to delete) ${arg}.`);
       break;
   }
-};
-
-const deleteAll = async (channel) => {
-  const messages = (await channel.messages.fetch()).array();
-  messages.forEach((m) => m.deletable && m.delete());
 };
 
 const handleRecord = async (arg, author, channel) => {
@@ -207,5 +208,4 @@ const linkFiles = async (channel, message) => {
 module.exports = {
   client,
   getDefaultChannel,
-  deleteAll,
 };
