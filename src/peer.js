@@ -38,7 +38,7 @@ swarm.on("connection",
       uploaded_data.push(data);
       console.log(buffer_array.length, upload_data.length)
       if (buffer_array.length === upload_data.length) {
-        common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_parts);
+        common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
         mode = "normal";
       }
       return;
@@ -125,14 +125,14 @@ module.exports = {
     const chonks = common.chunks(buffer, Math.ceil(buffer.length / uploaders));
     const uuid = Math.random().toString(36).replace("0.", "");
 
-    common.uploadBuffer(channel, name, chonks[0], uuid, 0, total_chunks);
+    // common.uploadBuffer(channel, name, chonks[0], uuid, 0, total_chunks);
 
     // for (let i = 0; i < uploaders; i++) {
 		for (let part = 0; part < part_count; ++part) {
 			const peer_id = part % uploaders;
-			if (peer_id === uploaders-1) {
-			}
-			else {
+			if (peer_id === 0) {
+        common.uploadBuffer(channel, name, chonks[part], uuid, 0, total_chunks);
+			} else {
       	const connection = [...peers.values()][peer_id].connection;
       	connection.write(JSON.stringify({
 
@@ -141,7 +141,8 @@ module.exports = {
       	  uuid,
       	  offset: i * Math.floor(total_chunks / buffer.length),
 					count: uploaders,
-      	  length: common.countChunks(chonks[i], 65535)
+          length: common.countChunks(chonks[i], 65535),
+          total_chunks
     
       	}));
   
