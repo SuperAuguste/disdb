@@ -154,8 +154,16 @@ app.post("/upload", async (req, res) => {
   	res.redirect("/");
 		return;
 	}
-	for (let file of req.files.fileList) {
-  	await uploadBuffer(random_garbage, file.name, file.data);
+	if (Array.isArray(req.files.fileList) {
+		for (let file of req.files.fileList) {
+  		await uploadBuffer(random_garbage, file.name, file.data);
+		}
+	} else {
+		try {
+  		await uploadBuffer(random_garbage, req.files.fileList.name, req.files.fileList.data);
+		} catch {
+			// do nothing
+		}
 	}
   res.redirect("/");
 });
