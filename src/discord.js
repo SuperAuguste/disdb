@@ -23,7 +23,7 @@ const {
 
 const client = new Discord.Client({
   restRequestTimeout: 600000,
-  retryLimit: 10
+  retryLimit: 10,
 });
 
 /**
@@ -44,7 +44,8 @@ client.on("ready", () => {
   }
 });
 
-const isClientBot = str => str && str.toUpperCase() === client.user.username.toUpperCase();
+const isClientBot = (str) =>
+  str && str.toUpperCase() === client.user.username.toUpperCase();
 
 client.on("message", async (message) => {
   const { content, channel, author } = message;
@@ -54,7 +55,7 @@ client.on("message", async (message) => {
     .filter(Boolean);
   switch (args[0]) {
     case "/delete":
-      handleDelete(args[1], message, channel);
+      handleDelete(args.slice(1).join(" "), message, channel);
       break;
     case "/upload_test":
       testUpload(channel);
@@ -66,7 +67,8 @@ client.on("message", async (message) => {
       if (isClientBot(args[1])) handleRecord(args[2], author, channel);
       break;
     case "/play":
-      if (isClientBot(args[1])) handlePlay(args[2], author, message);
+      if (isClientBot(args[1]))
+        handlePlay(args.slice(2).join(" "), author, message);
       break;
     default:
       break;
@@ -84,9 +86,11 @@ const handlePlay = async (filename, { id }, message) => {
     .filter((c) => c.type === "voice")
     .find((c) => c.members.map((m) => m.id).includes(id))
     .join()
-    .then((conn) => conn.play(`${baseUrl}download/${encodeURIComponent(filename)}`));
+    .then((conn) =>
+      conn.play(`${baseUrl}download/${encodeURIComponent(filename)}`)
+    );
   message.reply(`Playing ${filename}! <3`);
-}
+};
 
 const testUpload = async () => {
   const file_data = fs.readFileSync(
@@ -108,7 +112,11 @@ const handleDelete = async (arg, message, channel) => {
       message.reply("Deleted all files, my sir.");
       break;
     default:
-      message.reply(await deleteFile(arg, channel) ? `Deleted ${arg}.` : `Unable to delete ${arg}.`);
+      message.reply(
+        (await deleteFile(arg, channel))
+          ? `Deleted ${arg}.`
+          : `Unable to delete ${arg}.`
+      );
       break;
   }
 };
@@ -139,11 +147,12 @@ class Silence extends Readable {
  * @param {Buffer} Buffer
  * @returns {Buffer}
  */
-const encodeWav = buffer => encodeWavHelper(buffer, {
-  numChannels: 2,
-  sampleRate: 48000,
-  byteRate: 16
-});
+const encodeWav = (buffer) =>
+  encodeWavHelper(buffer, {
+    numChannels: 2,
+    sampleRate: 48000,
+    byteRate: 16,
+  });
 
 const userRequestMap = {};
 
@@ -157,7 +166,13 @@ const finishRecording = async (user, channel) => {
     const { arr, offset, filename, uuid } = userRequestMap[id];
     userRequestMap[id] = undefined;
 
-    await uploadBuffer(channel, filename, encodeWav(Buffer.concat(arr)), uuid, offset);
+    await uploadBuffer(
+      channel,
+      filename,
+      encodeWav(Buffer.concat(arr)),
+      uuid,
+      offset
+    );
   }
 };
 
@@ -173,7 +188,7 @@ const recordAudio = async (user, channel) => {
     offset: 0,
     uuid: Math.random().toString(36).replace("0.", ""),
     filename: `${username}_recording_request.wav`,
-    stream: undefined
+    stream: undefined,
   };
 
   /**
