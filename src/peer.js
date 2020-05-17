@@ -117,7 +117,7 @@ module.exports = {
     }
   },
 
-  uploadFile (name, buffer) async {
+  async uploadFile (name, buffer) {
 
     const uploaders = peers.size + 1;
 
