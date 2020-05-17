@@ -24,11 +24,19 @@ function assert(cond, err) {
   }
 }
 
+/**
+ * Uploads a buffer to DisDB, splitting it into 8mb chunks and upload in parts.
+ * @param {Discord.TextChannel} channel 
+ * @param {string} name 
+ * @param {Buffer} buffer 
+ * @param {string} [uuid] 
+ * @param {number} [offset]
+ */
 function uploadBuffer(
   channel,
   name,
   buffer,
-  random = Math.random().toString(36).replace("0.", ""),
+  uuid = Math.random().toString(36).replace("0.", ""),
   offset = 0
 ) {
   let i = 0;
@@ -37,7 +45,7 @@ function uploadBuffer(
   for (const chunk of chonks) {
     a.push(
       channel.send(
-        `UPLOAD ${name}_${random}, part ${i + 1 + offset} / ${chonks.length} (${
+        `UPLOAD ${name}_${uuid}, part ${i + 1 + offset} / ${chonks.length} (${
           chonks.length - i - 1
         } seconds remaining)`,
         {
@@ -52,6 +60,11 @@ function uploadBuffer(
   return { ...Promise.all(a), length: a.length };
 }
 
+/**
+ * Parses the content from an "UPLOAD" DisDB message.
+ * @param {string} content 
+ * @returns {filename: string, partNo: string, totalParts: string}
+ */
 const parseMessageContent = (content) => {
   const splitMsg = content.split(",");
   const filename = splitMsg[0].split("UPLOAD ")[1];
@@ -74,6 +87,10 @@ const xss = (str) =>
     .replace(/'/g, "&#x27")
     .replace(/\//g, "&#x2F");
 
+/**
+ * Lists all valid files in a DisDB storage channel.
+ * @param {Discord.TexChannel} channel 
+ */
 const listFiles = async (channel) => {
   let messages = (await channel.messages.fetch()).array();
   let names = new Set();
@@ -100,6 +117,16 @@ const listFiles = async (channel) => {
   return [...names].map((str) => xss(str));
 };
 
+/************************************************************************
+  Delete file(s) from the given channel.
+ ************************************************************************/
+
+ /**
+ * Deletes a file from the DisDB channel.
+ * The filename must match a <NAME>.<EXTENSION>_<UUID> format.
+ * @param {string} filename
+ * @param {Discord.TexChannel} channel 
+ */
 const deleteFile = async (reqFilename, channel) => {
   let messages = (await channel.messages.fetch()).array();
   console.log("Deleting file...", reqFilename);
@@ -122,6 +149,10 @@ const deleteFile = async (reqFilename, channel) => {
   }
 };
 
+/**
+ * Wipes all DisDB files from a discord channel.
+ * @param {Discord.TexChannel} channel 
+ */
 const deleteAllFiles = async (channel) => {
   const messages = (await channel.messages.fetch()).array();
   messages.forEach((m) => m.deletable && m.delete());
