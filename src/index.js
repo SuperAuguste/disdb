@@ -4,7 +4,7 @@ const express = require("express");
 
 const { deleteFile, listFiles } = require('./common');
 const { client, getDefaultChannel } = require('./discord');
-const { uploadHandler, downloadHandler, streamHandler } = require("./controllers");
+const { uploadHandler, downloadHandler, streamHandler, previewHandler } = require("./controllers");
 
 const app = express();
 
