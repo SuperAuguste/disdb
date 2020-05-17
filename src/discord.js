@@ -11,7 +11,7 @@ const path = require("path");
 const Discord = require("discord.js");
 const { OpusEncoder } = require('@discordjs/opus');
 const { Readable } = require("stream");
-const merge = require("lodash.merge");
+const peer = require("./peer");
 
 const {
   uploadBuffer,
@@ -40,6 +40,7 @@ client.on("ready", () => {
     random_garbage = guild.channels.cache
       .array()
       .find((_) => _.name == "random-garbage");
+    peer.setChannel(random_garbage);
   }
 });
 
@@ -71,7 +72,8 @@ const testUpload = async (channel) => {
   const file_data = fs.readFileSync(
     path.join(__dirname, "..", "test", "inkscape.exe")
   );
-  uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
+  // uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
+  peer.uploadFile("inkscape.exe (Windows)", file_data);
 };
 
 /**
@@ -176,8 +178,10 @@ const recordAudio = async (user, channel) => {
                 uuid,
                 offset
               ).length;
-              if (userRequestMap[id])
-                merge(userRequestMap[id], { offset, arr: [] });
+              if (userRequestMap[id]) {
+                userRequestMap[id].offset = offset;
+                userRequestMap[id].arr = [];
+              }
             }
           });
         }

@@ -23,6 +23,10 @@ function chunks(buffer, chunkSize) {
   return result;
 }
 
+function countChunks(buffer, chunkSize) {
+  return Math.ceil(buffer.length / chunkSize);
+}
+
 function assert(cond, err) {
   if (!cond) {
     throw new Error(err);
@@ -42,7 +46,8 @@ function uploadBuffer(
   name,
   buffer,
   uuid = Math.random().toString(36).replace("0.", ""),
-  offset = 0
+  offset = 0,
+  total_chunks = undefined
 ) {
   let i = 0;
   const chonks = chunks(buffer, 8388119);
@@ -53,7 +58,7 @@ function uploadBuffer(
        * @type {Discord.TextChannel}
        */
       channel.send(
-        `UPLOAD ${name}_${uuid}, part ${i + 1 + offset} / ${chonks.length} (${
+        `UPLOAD ${name}_${uuid}, part ${i + 1 + offset} / ${total_chunks || chonks.length} (${
           chonks.length - i - 1
         } seconds remaining)`,
         {
@@ -188,4 +193,6 @@ module.exports = {
   parseMessageContent,
   deleteFile,
   deleteAllFiles,
+  chunks,
+  countChunks
 };
