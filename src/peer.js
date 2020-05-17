@@ -35,7 +35,7 @@ swarm.on("connection",
   connection.on("data", (data, info) => {
 
     if (mode === "upload") {
-      uploaded_data.push(data);
+      buffer_array.push(data);
       console.log(buffer_array.length, upload_data.length)
       if (buffer_array.length === upload_data.length) {
         common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
