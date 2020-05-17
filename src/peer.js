@@ -40,7 +40,7 @@ swarm.on("connection",
       if (buffer_array.length === upload_data.length) {
         // common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
         channel.send(
-          `UPLOAD ${upload_data.name}_${upload_data.uuid}, part ${upload_data.offset} / ${data.total_chunks} ()`,
+          `UPLOAD ${upload_data.name}_${upload_data.uuid}, part ${upload_data.offset} / ${upload_data.total_chunks} ()`,
           {
             files: [Buffer.concat(buffer_array)],
           }
@@ -88,6 +88,14 @@ swarm.on("connection",
   }));
 
 });
+
+function wait(ms) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+};
 
 module.exports = {
 
@@ -143,7 +151,7 @@ module.exports = {
         console.log(part);
         // common.uploadBuffer(channel, name, chonks[part], uuid, 0, total_chunks);
         channel.send(
-          `UPLOAD ${name}_${uuid}, part ${part} / ${total_chunks} ()`,
+          `UPLOAD ${name}_${uuid}, part ${part + 1} / ${total_chunks} ()`,
           {
             files: [chonks[part]],
           }
@@ -155,22 +163,28 @@ module.exports = {
       	  type: "upload",
       	  name,
       	  uuid,
-      	  offset: part,
+      	  offset: part + 1,
 					count: uploaders,
           length: common.countChunks(chonks[part], 65535),
           total_chunks
     
       	}));
   
-      	const bufferStream = new stream.PassThrough();
+        // setTimeout(() => {
+        await wait(100);
+        connection.write(chonks[part]);
+        await wait(100);
+        // }, 100);
+
+      	// const bufferStream = new stream.PassThrough();
   
-      	bufferStream.end(chonks[part]);
+      	// bufferStream.end(chonks[part]);
   
-      	await setTimeout(() => {
+      	// await setTimeout(() => {
   
-      	  bufferStream.pipe(connection);
+      	//   bufferStream.pipe(connection);
   
-      	}, 100);
+      	// }, 100);
 			}
     }
 
