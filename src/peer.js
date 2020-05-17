@@ -46,6 +46,7 @@ swarm.on("connection",
       return;
     }
 
+		console.log(data.toString());
 		const message = JSON.parse(data.toString());
 
 		switch (message.type) {
