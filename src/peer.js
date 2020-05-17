@@ -128,27 +128,27 @@ module.exports = {
     // common.uploadBuffer(channel, name, chonks[0], uuid, 0, total_chunks);
 
     // for (let i = 0; i < uploaders; i++) {
-		for (let part = 0; part < part_count; ++part) {
+		for (let part = 0; part < total_chunks; ++part) {
 			const peer_id = part % uploaders;
 			if (peer_id === 0) {
         common.uploadBuffer(channel, name, chonks[part], uuid, 0, total_chunks);
 			} else {
-      	const connection = [...peers.values()][peer_id].connection;
+      	const connection = [...peers.values()][peer_id - 1].connection;
       	connection.write(JSON.stringify({
 
       	  type: "upload",
       	  name,
       	  uuid,
-      	  offset: i * Math.floor(total_chunks / buffer.length),
+      	  offset: part * Math.floor(total_chunks / buffer.length),
 					count: uploaders,
-          length: common.countChunks(chonks[i], 65535),
+          length: common.countChunks(chonks[part], 65535),
           total_chunks
     
       	}));
   
       	const bufferStream = new stream.PassThrough();
   
-      	bufferStream.end(chonks[i]);
+      	bufferStream.end(chonks[part]);
   
       	await setTimeout(() => {
   
