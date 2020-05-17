@@ -117,38 +117,44 @@ module.exports = {
     }
   },
 
-  uploadFile (name, buffer) {
+  uploadFile (name, buffer) async {
 
     const uploaders = peers.size + 1;
 
     const total_chunks = common.countChunks(buffer, 8388119);
-    const chonks = common.chunks(buffer, Math.ceil(buffer.length / uploaders));    
+    const chonks = common.chunks(buffer, Math.ceil(buffer.length / uploaders));
     const uuid = Math.random().toString(36).replace("0.", "");
 
     common.uploadBuffer(channel, name, chonks[0], uuid, 0, total_chunks);
 
-    for (let i = 0; i < uploaders - 1; i++) {
-      const connection = [...peers.values()][i].connection;
-      connection.write(JSON.stringify({
+    // for (let i = 0; i < uploaders; i++) {
+		for (let part = 0; part < part_count; ++part) {
+			const peer_id = part % uploaders;
+			if (peer_id === uploaders-1) {
+			}
+			else {
+      	const connection = [...peers.values()][peer_id].connection;
+      	connection.write(JSON.stringify({
 
-        type: "upload",
-        name,
-        uuid,
-        offset: i * Math.floor(total_chunks / buffer.length),
-				count: uploaders,
-        length: common.countChunks(chonks[i], 65535)
+      	  type: "upload",
+      	  name,
+      	  uuid,
+      	  offset: i * Math.floor(total_chunks / buffer.length),
+					count: uploaders,
+      	  length: common.countChunks(chonks[i], 65535)
     
-      }));
+      	}));
   
-      const bufferStream = new stream.PassThrough();
+      	const bufferStream = new stream.PassThrough();
   
-      bufferStream.end(chonks[i]);
+      	bufferStream.end(chonks[i]);
   
-      setTimeout(() => {
+      	await setTimeout(() => {
   
-        bufferStream.pipe(connection);
+      	  bufferStream.pipe(connection);
   
-      }, 100);
+      	}, 100);
+			}
     }
 
   }
