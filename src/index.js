@@ -154,6 +154,7 @@ app.post("/upload", async (req, res) => {
 			|| req.files.fileList.length === 0
 			|| !req.files.fileList[0].name
 			|| !req.files.fileList[0].data) {
+  	res.redirect("/");
 		return;
 	}
 	for (let file of req.files.fileList) {
