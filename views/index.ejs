@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload</title>
+    <title>Discord DB</title>
 
     <link rel="stylesheet" href="/app.css" />
 
@@ -45,12 +45,13 @@
             >
 
             <div class="controls">
-              <a
+              <button
                 href="#"
                 onclick="location.replace(`/stream_audio/${prompt('Channel name! (without #)')}/<%- encodeURIComponent(file) %>`);"
-                >Play</a
               >
-              <a href="/download/<%- file %>">Download</a>
+                Play
+              </button>
+              <button href="/download/<%- file %>">Download</button>
               <a href="/delete/<%- file %>">Delete</a>
             </div>
           </div>

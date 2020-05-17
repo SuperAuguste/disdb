@@ -220,6 +220,13 @@ const linkFiles = async (channel, message) => {
 	message.reply(embedded);
 }
 
+const xss = (str) => str.replace(/\&/g, '&amp;')
+	.replace(/\</g, '&lt;')
+	.replace(/\>/g, '&gt;')
+	.replace(/\"/g, '&quot;')
+	.replace(/\'/g, '&#x27')
+	.replace(/\//g, '&#x2F');
+
 const listFiles = async (channel = random_garbage) => {
   let messages = (await channel.messages.fetch()).array();
   let names = new Set();
@@ -241,7 +248,7 @@ const listFiles = async (channel = random_garbage) => {
       })).array();
     }
   }
-  return [...names];
+  return [...names].map(str => xss(str));
 };
 
 const parseMessageContent = (content) => {
@@ -262,13 +269,20 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.fileList
-			|| req.files.fileList.length === 0) {
+  if (!req.files.fileList) {
   	res.redirect("/");
 		return;
 	}
-	for (let file of req.files.fileList) {
-  	await uploadBuffer(random_garbage, file.name, file.data);
+	if (Array.isArray(req.files.fileList)) {
+		for (let file of req.files.fileList) {
+  		await uploadBuffer(random_garbage, file.name, file.data);
+		}
+	} else {
+		try {
+  		await uploadBuffer(random_garbage, req.files.fileList.name, req.files.fileList.data);
+		} catch {
+			// do nothing
+		}
 	}
   res.redirect("/");
 });
