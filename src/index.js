@@ -187,7 +187,7 @@ let downloadFn = async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
   res.write(buf);
   res.end();
-
+}
 
 const download = async (req, res) => {
 	try {
