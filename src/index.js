@@ -90,9 +90,19 @@ client.on("message", async (message) => {
     );
     uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
   } else if (message.content === "/list") {
-    listFiles(message.channel, message);
+	linkFiles(message.channel, message);
   }
 });
+
+const linkFiles = async (channel, message) => {
+	const fileNames = await listFiles(channel, message);
+	const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+	const embedded = new Discord.MessageEmbed();
+	embedded.description = fileNames.length 
+		? fileNames.map(n => `[${n.split("_")[0]}](${baseUrl}/download/${n.replace(/ /g, "%20")})`).join("\n")
+		: "Unable to find any uploaded files!";
+	message.reply(embedded);
+}
 
 const listFiles = async (channel = random_garbage, message) => {
   let messages = (await channel.messages.fetch()).array();
@@ -107,10 +117,8 @@ const listFiles = async (channel = random_garbage, message) => {
 	  if (partNo === totalParts) names.add(filename);
     }
 
-    i++;
-
-    // console.log(m);
-
+	i++;
+	
     if (i === messages.length) {
       i = 0;
       messages = (await channel.messages.fetch({
@@ -118,12 +126,7 @@ const listFiles = async (channel = random_garbage, message) => {
       })).array();
     }
   }
-	let namefn = (names) => names.map((name) => "https://disdb.herokuapp.com/download/" + name).join("\n");
-  if (message) {
-		names.size
-    	? message.reply(namefn([...names]))
-    	: message.reply("Unable to find any completely uploaded files!");
-  } else return [...names];
+  return [...names];
 };
 
 const parseMessageContent = (content) => {
