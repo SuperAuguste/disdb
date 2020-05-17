@@ -18,7 +18,7 @@
 			<div id="files">
 				<% for (const file of files) { %>
 		
-					<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;">(<%- file.split("_").slice(-1) %>)</span></div>
+					<div><a href="/download/<%- file %>"><%- file.split("_").slice(0, -1).join("") %></a> <span style="float: right;"><a href="/stream_audio/<%- file %>">Play</a> (<%- file.split("_").slice(-1) %>)</span></div>
 		
 				<% } %>
 			</div>
