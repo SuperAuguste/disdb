@@ -227,7 +227,7 @@ const listFiles = async (channel = random_garbage) => {
       })).array();
     }
   }
-  return [...names];
+  return [...names].map(str => encodeURIComponent(str));
 };
 
 const parseMessageContent = (content) => {
