@@ -86,6 +86,15 @@ const downloadHandler = async (req, res) => {
   }
 };
 
+const previewHandler = async (req, res) => {
+	try {
+		random_garbage.send(`${baseUrl}preview/${encodeURIComponent(req.params.file)}.${req.params.file.split('_')[req.params.file.split('_').length-2]}`);
+  	res.redirect("/");
+	} catch {
+		// do nothing
+	}
+};
+
 const streamHandler = async (req, res) => {
   /**
    * @type {Discord.VoiceChannel}
