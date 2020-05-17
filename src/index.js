@@ -88,36 +88,50 @@ function uploadBuffer(channel, name, buffer, random = Math.random().toString(36)
 
 client.on("message", async (message) => {
   const {content, channel, author } = message;
-
-  switch (content) {
+  const args = content.split(" ").map(s => s.trim()).filter(Boolean);
+  switch (args[0]) {
     case "/delete":
-      const messages = (await channel.messages.fetch()).array();
-      for (const cmessage of messages) {
-        if (cmessage.deletable) cmessage.delete();
+      switch (args[1]) {
+        case undefined: 
+          deleteAll(channel);
+          message.reply("Deleted all files, my sir.");
+          break;
+        default:
+          deleteFile(args[1], channel);
+          message.reply(`Deleted (or tried to delete) ${args[1]}.`);
+          break;
       }
-      message.reply("I oblige, master.");
-
       break;
     case "/upload_test":
       const file_data = fs.readFileSync(
         path.join(__dirname, "..", "test", "inkscape.exe")
       );
       uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
-
       break;
     case "/list":
       linkFiles(channel, message);
       break;
-    case "/record start":
-      recordAudio(author, channel);
-      break;
-    case "/record stop":
-      finishRecording(author, channel);
+    case "/record":
+      switch (args[1]) {
+        case "start": 
+          recordAudio(author, channel);
+          break;
+        case "stop":
+          finishRecording(author, channel);
+          break;
+        default:
+          break;
+      }
       break;
     default:
       break;
   }
 });
+
+const deleteAll = async (channel) => {
+  const messages = (await channel.messages.fetch()).array();
+  messages.forEach(m => m.deletable && m.delete());
+}
 
 const userRequestMap = {};
 
@@ -314,6 +328,25 @@ let downloadFn = async (req, res) => {
   res.end();
 }
 
+const deleteFile = async (reqFilename, channel = random_garbage) => {
+  let messages = (await channel.messages.fetch()).array();
+  console.log("Deleting file...", reqFilename);
+
+  while (messages.length) {
+    const m = messages.pop();
+    const {author: { bot }, content, deletable, id} = m;
+    if (content.indexOf("-- INTERRUPT --") > -1) break;
+    if (bot 
+        && deletable
+        && content.indexOf("UPLOAD") > -1) {
+        const { filename: msgFilename } = parseMessageContent(content);
+        if (reqFilename === msgFilename) m.delete();
+    }
+    if (!messages.length)  messages = (await random_garbage.messages.fetch({ before: id })).array();
+  }
+
+}
+
 const download = async (req, res) => {
 	try {
 		await downloadFn(req, res);
@@ -324,6 +357,7 @@ const download = async (req, res) => {
 
 app.get("/download/:file", download);
 app.get("/preview/:file.*", download);
+app.get("/delete/:file", req => deleteFile(req.params.file));
 
 app.get("/show_preview/:file", (req, res) => {
   /**
