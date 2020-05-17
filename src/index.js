@@ -99,18 +99,19 @@ const linkFiles = async (channel, message) => {
 	const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
 	const embedded = new Discord.MessageEmbed();
 	embedded.description = fileNames.length 
-		? fileNames.map(n => `[${n.split("_")[0]}](${baseUrl}/download/${n.replace(/ /g, "%20")})`).join("\n")
+		? fileNames
+			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}/download/${n.replace(/ /g, "%20")})`)
+			.join("\n")
 		: "Unable to find any uploaded files!";
 	message.reply(embedded);
 }
 
-const listFiles = async (channel = random_garbage, message) => {
+const listFiles = async (channel = random_garbage) => {
   let messages = (await channel.messages.fetch()).array();
   let names = new Set();
   let i = 0;
   while (i < messages.length) {
-    const m = messages[i];
-	  const { author, content } = m;
+	const { author, content } = messages[i];
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
