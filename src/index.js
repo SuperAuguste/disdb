@@ -149,11 +149,11 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.fileList ) {
+  if (!req.files.fileList) {
   	res.redirect("/");
 		return;
 	}
-	if (Array.isArray(req.files.fileList) {
+	if (Array.isArray(req.files.fileList)) {
 		for (let file of req.files.fileList) {
   		await uploadBuffer(random_garbage, file.name, file.data);
 		}
