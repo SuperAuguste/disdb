@@ -9,8 +9,8 @@ const path = require("path");
  * @typedef {import('discord.js').MessageEmbed} Discord.MessageEmbed
  */
 const Discord = require("discord.js");
-const { OpusEncoder } = require('@discordjs/opus');
 const { Readable } = require("stream");
+const { encodeWav: encodeWavHelper } = require("wav-converter");
 const peer = require("./peer");
 
 const {
@@ -68,7 +68,7 @@ client.on("message", async (message) => {
   }
 });
 
-const testUpload = async (channel) => {
+const testUpload = async () => {
   const file_data = fs.readFileSync(
     path.join(__dirname, "..", "test", "inkscape.exe")
   );
@@ -115,6 +115,16 @@ class Silence extends Readable {
   }
 }
 
+/**
+ * @param {Buffer} Buffer
+ * @returns {Buffer}
+ */
+const encodeWav = buffer => encodeWavHelper(buffer, {
+  numChannels: 2,
+  sampleRate: 48000,
+  byteRate: 16
+});
+
 const userRequestMap = {};
 
 /**
@@ -127,7 +137,7 @@ const finishRecording = async (user, channel) => {
     const { arr, offset, filename, uuid } = userRequestMap[id];
     userRequestMap[id] = undefined;
 
-    await uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset);
+    await uploadBuffer(channel, filename, encodeWav(Buffer.concat(arr)), uuid, offset);
   }
 };
 
@@ -142,7 +152,7 @@ const recordAudio = async (user, channel) => {
     arr: [],
     offset: 0,
     uuid: Math.random().toString(36).replace("0.", ""),
-    filename: `${username}_recording_request.pcm`,
+    filename: `${username}_recording_request.wav`,
     stream: undefined
   };
 
@@ -174,7 +184,7 @@ const recordAudio = async (user, channel) => {
               offset += uploadBuffer(
                 channel,
                 filename,
-                Buffer.concat(arr),
+                encodeWav(Buffer.concat(arr)),
                 uuid,
                 offset
               ).length;
