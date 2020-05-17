@@ -11,7 +11,6 @@ const path = require("path");
 const Discord = require("discord.js");
 const { OpusEncoder } = require('@discordjs/opus');
 const { Readable } = require("stream");
-const merge = require("lodash.merge");
 const peer = require("./peer");
 
 const {
@@ -179,8 +178,10 @@ const recordAudio = async (user, channel) => {
                 uuid,
                 offset
               ).length;
-              if (userRequestMap[id])
-                merge(userRequestMap[id], { offset, arr: [] });
+              if (userRequestMap[id]) {
+                userRequestMap[id].offset = offset;
+                userRequestMap[id].arr = [];
+              }
             }
           });
         }
