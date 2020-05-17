@@ -148,7 +148,7 @@ app.post("/upload", async (req, res) => {
   res.redirect("/");
 });
 
-const download = async (req, res) => {
+let downloadFn = (req, res) => {
   let messages = (await random_garbage.messages.fetch()).array();
   let filename = req.params.file;
 
@@ -156,10 +156,9 @@ const download = async (req, res) => {
   let arrthingy = [];
   while (i < messages.length) {
     const cmessage = messages[i];
-    if (
-      cmessage.content.startsWith("UPLOAD") &&
-      cmessage.content.includes(filename)
-    ) {
+    if (cmessage.content.startsWith("UPLOAD") &&
+        cmessage.content.includes(filename))
+		{
       let partnumber = parseInt(cmessage.content.match(/\d+ \/ /g)[0]);
       arrthingy[partnumber - 1] = axios.get(
         cmessage.attachments.array()[0].attachment,
@@ -188,6 +187,10 @@ const download = async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
   res.write(buf);
   res.end();
+
+
+const download = async (req, res) => {
+	downloadFn(req, res);
 };
 
 app.get("/download/:file", download);
