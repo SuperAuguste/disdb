@@ -14,13 +14,13 @@
 		<div id="dragMessage">Drop a File to Upload</div>
 		<div id="dragOverlay"></div>
 		<script>
-		document.querySelector('#dragOverlay').on('dragenter', function (e) {
+		document.querySelector('#dragOverlay').addEventListener('dragenter', function (e) {
     	e.originalEvent.stopPropagation();
     	e.originalEvent.preventDefault();
     	console.log('dragenter');
     	$('body').addClass('dragenter');
 		});
-		document.querySelector('#dragOverlay').on('dragleave', function (e) {
+		document.querySelector('#dragOverlay').addEventListener('dragleave', function (e) {
     	e.originalEvent.stopPropagation();
     	e.originalEvent.preventDefault();
     	console.log('dragleave');
