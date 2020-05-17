@@ -98,6 +98,7 @@ client.on("message", async (message) => {
           break;
         default:
           deleteFile(args[1], channel);
+          message.reply(`Deleted (or tried to delete) ${args[1]}.`);
           break;
       }
       break;
@@ -320,7 +321,6 @@ const deleteFile = async (reqFilename, channel = random_garbage) => {
   while (messages.length) {
     const m = messages.pop();
     const {author: { bot }, content, deletable, id} = m;
-    if (bot) console.log(content);
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (bot 
         && deletable
@@ -328,8 +328,7 @@ const deleteFile = async (reqFilename, channel = random_garbage) => {
         const { filename: msgFilename } = parseMessageContent(content);
         if (reqFilename === msgFilename) m.delete();
     }
-    if (!messages.length) messages = 
-      (await random_garbage.messages.fetch({ before: id })).array();  
+    if (!messages.length)  messages = (await random_garbage.messages.fetch({ before: id })).array();
   }
 
 }
