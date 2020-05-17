@@ -12,16 +12,42 @@ html, body {
 
 main {
 
-    padding: 20px;
+    /* padding: 20px; */
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+}
+
+main>*:first-child {
+
+    grid-column: 1;
+    padding: 40px;
+
+}
+
+main>*:last-child {
+
+    grid-column: 2;
+    padding: 40px;
 
 }
 
 #files>* {
+
     padding: 5px 0px;
+    margin-bottom: 10px;
+
 }
 
-#files>*, #files a {
+#files a {
 
     color: #4263eb;
+
+}
+
+.play {
+
+    display: block;
 
 }
