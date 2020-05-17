@@ -179,7 +179,7 @@ module.exports = {
   
         // setTimeout(() => {
         await wait(100);
-        common.chunks(chonks[part], 65535).map(_ => connection.write(chonks[part]));
+        common.chunks(chonks[part], 65535).map(_ => connection.write(_));
         console.log(`${part}`);
         // const bufferStream = new stream.PassThrough();
         // }, 100);
