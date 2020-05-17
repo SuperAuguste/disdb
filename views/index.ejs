@@ -6,6 +6,8 @@
 	<title>Upload</title>
 
 	<link rel="stylesheet" href="/app.css">
+
+	<style id="dark"></style>
 </head>
 <body>
 	
@@ -64,13 +66,59 @@
 			action='/upload' 
 			method='post' 
 			encType="multipart/form-data">
-				<input type="file" name="foo">
+				<input type="file" name="foo" id="foo">
 				<input type='submit' value='Upload!'>
 			</form>
 	
 		</div>
 
 	</main>
+
+	<div id="toggle">
+		<img id="toggler" src="moon.svg">
+	</div>
+
+	<script>
+
+		let cooldown;
+
+		document.getElementById("toggle").addEventListener("click", () => {
+			const dark = document.getElementById("dark");
+			if (!dark.innerHTML.length) {
+				dark.innerHTML = `html, body {
+			color: rgb(190, 190, 190);
+			background-color: black;
+			}`;
+			document.getElementById("toggle").style.backgroundColor = "white";
+			document.getElementById("toggler").src = "sun.svg";
+			} else {
+				dark.innerHTML = "";
+				document.getElementById("toggle").style.backgroundColor = "black";
+				document.getElementById("toggler").src = "moon.svg";
+			}
+		});
+
+		document.addEventListener("dragover", () => {
+			document.getElementById("foo").classList.add("drag");
+		});
+
+		document.addEventListener("dragend", () => {
+			document.getElementById("foo").classList.remove("drag");
+		});
+
+		document.addEventListener("dragleave", event => {
+			if (cooldown) clearTimeout(cooldown);
+			cooldown = setTimeout(() => {
+				document.getElementById("foo").classList.remove("drag");
+				cooldown = undefined;
+			}, 1000);
+		});
+
+		document.addEventListener("drop", () => {
+			document.getElementById("foo").classList.remove("drag");
+		});
+
+	</script>
 
 </body>
 </html>
