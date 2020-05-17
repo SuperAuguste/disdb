@@ -54,7 +54,7 @@ client.on("message", async (message) => {
     case "/delete":
       handleDelete(args[1], message, channel);
       break;
-    case "/upload_test":
+    case "/upload_testppp":
       testUpload(channel);
       break;
     case "/list":
