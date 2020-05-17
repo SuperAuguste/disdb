@@ -18,7 +18,7 @@ html, body {
 }
 
 main {
-	/* padding: 20px; */
+	padding: 20px;
 
 	display: grid;
 	grid-template-columns: 1fr 1fr;
