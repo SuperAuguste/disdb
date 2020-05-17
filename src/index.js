@@ -149,6 +149,7 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
+  if (!req.files.foo || !req.files.foo.name || !!req.files.foo.data) return;
   await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
   res.redirect("/");
 });
@@ -205,13 +206,12 @@ const download = async (req, res) => {
 app.get("/download/:file", download);
 app.get("/preview/:file.*", download);
 
-app.get("/stream_audio/:file", (req, res) => {
-  const owner = "317403043220029441";
-
+app.get("/stream_audio/:channel/:file", (req, res) => {
   /**
    * @type {Discord.VoiceChannel}
    */
-  const vc = random_garbage.guild.channels.cache.array().filter(_ => _.type === "voice").find(_ => _.members.array().find(_ => _.id === owner));
+  const vc = random_garbage.guild.channels.cache.array().filter(_ => _.type === "voice").find(_ => _.name === req.params.channel);
+  
   vc.join().then(conn => {
     conn.play(`${baseUrl}/download/${encodeURIComponent(req.params.file)}`);
     res.redirect("/");
