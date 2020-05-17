@@ -38,7 +38,13 @@ swarm.on("connection",
       buffer_array.push(data);
       console.log(buffer_array.length, upload_data.length)
       if (buffer_array.length === upload_data.length) {
-        common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
+        // common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
+        channel.send(
+          `UPLOAD ${upload_data.name}_${upload_data.uuid}, part ${upload_data.offset} / ${data.total_chunks} ()`,
+          {
+            files: [Buffer.concat(buffer_array)],
+          }
+        )
         mode = "normal";
       }
       return;
@@ -122,16 +128,26 @@ module.exports = {
     const uploaders = peers.size + 1;
 
     const total_chunks = common.countChunks(buffer, 8388119);
-    const chonks = common.chunks(buffer, Math.ceil(buffer.length / uploaders));
+    // const chonks = common.chunks(buffer, Math.ceil(buffer.length / uploaders));
+    const chonks = common.chunks(buffer, 8388119);
     const uuid = Math.random().toString(36).replace("0.", "");
 
     // common.uploadBuffer(channel, name, chonks[0], uuid, 0, total_chunks);
 
+    // console.log(total_chunks);
     // for (let i = 0; i < uploaders; i++) {
+    console.log(chonks.length, total_chunks);
 		for (let part = 0; part < total_chunks; ++part) {
 			const peer_id = part % uploaders;
 			if (peer_id === 0) {
-        common.uploadBuffer(channel, name, chonks[part], uuid, 0, total_chunks);
+        console.log(part);
+        // common.uploadBuffer(channel, name, chonks[part], uuid, 0, total_chunks);
+        channel.send(
+          `UPLOAD ${name}_${uuid}, part ${part} / ${total_chunks} ()`,
+          {
+            files: [chonks[part]],
+          }
+        )
 			} else {
       	const connection = [...peers.values()][peer_id - 1].connection;
       	connection.write(JSON.stringify({
@@ -139,7 +155,7 @@ module.exports = {
       	  type: "upload",
       	  name,
       	  uuid,
-      	  offset: part * Math.floor(total_chunks / buffer.length),
+      	  offset: part,
 					count: uploaders,
           length: common.countChunks(chonks[part], 65535),
           total_chunks
