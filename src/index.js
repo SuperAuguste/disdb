@@ -149,8 +149,7 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.fileList
-			|| req.files.fileList.length === 0) {
+  if (!req.files.fileList ) {
   	res.redirect("/");
 		return;
 	}
