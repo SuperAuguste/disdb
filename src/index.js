@@ -101,7 +101,7 @@ const linkFiles = async (channel, message) => {
 	const embedded = new Discord.MessageEmbed();
 	embedded.description = fileNames.length 
 		? fileNames
-			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}download/${encodeURIComponent(n)})`)
+			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}/download/${encodeURIComponent(n)})`)
 			.join("\n")
 		: "Unable to find any uploaded files!";
 	message.reply(embedded);
