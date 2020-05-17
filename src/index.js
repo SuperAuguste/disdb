@@ -206,6 +206,13 @@ const linkFiles = async (channel, message) => {
 	message.reply(embedded);
 }
 
+const xss = (str) => str.replace(/\&/g, '&amp;')
+	.replace(/\</g, '&lt;')
+	.replace(/\>/g, '&gt;')
+	.replace(/\"/g, '&quot;')
+	.replace(/\'/g, '&#x27')
+	.replace(/\//g, '&#x2F');
+
 const listFiles = async (channel = random_garbage) => {
   let messages = (await channel.messages.fetch()).array();
   let names = new Set();
@@ -227,7 +234,7 @@ const listFiles = async (channel = random_garbage) => {
       })).array();
     }
   }
-  return [...names].map(str => encodeURIComponent(str));
+  return [...names].map(str => xss(str));
 };
 
 const parseMessageContent = (content) => {
