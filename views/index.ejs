@@ -11,6 +11,23 @@
 	
 	<main>
 
+		<div id="dragMessage">Drop a File to Upload</div>
+		<div id="dragOverlay"></div>
+		<script>
+		document.querySelector('#dragOverlay').on('dragenter', function (e) {
+    	e.originalEvent.stopPropagation();
+    	e.originalEvent.preventDefault();
+    	console.log('dragenter');
+    	$('body').addClass('dragenter');
+		});
+		document.querySelector('#dragOverlay').on('dragleave', function (e) {
+    	e.originalEvent.stopPropagation();
+    	e.originalEvent.preventDefault();
+    	console.log('dragleave');
+    	document.querySelector('body').removeClass('dragenter');
+		});
+		</script>
+
 		<div id="list">
 
 			<h1>Files</h1>
