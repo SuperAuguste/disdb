@@ -61,7 +61,7 @@ client.on("message", async (message) => {
     case "/list":
       linkFiles(channel, message);
       break;
-    case "/recorda":
+    case "/record":
       handleRecord(args[1], author, channel);
       break;
     default:
