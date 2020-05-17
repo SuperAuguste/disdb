@@ -92,7 +92,7 @@ client.on("message", async (message) => {
     );
     uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
   } else if (message.content === "/list") {
-	linkFiles(message.channel, message);
+		linkFiles(message.channel, message);
   }
 });
 
@@ -149,8 +149,16 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.foo || !req.files.foo.name || !req.files.foo.data) return;
-  await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
+  if (!req.files.fileList
+			|| Array.isArray(req.files.fileList)
+			|| req.files.fileList.length === 0
+			|| !req.files.fileList[0].name
+			|| !req.files.fileList[0].data) {
+		return;
+	}
+	for (let file of req.files.fileList) {
+  	await uploadBuffer(random_garbage, file.name, file.data);
+	}
   res.redirect("/");
 });
 
