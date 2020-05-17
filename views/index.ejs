@@ -15,14 +15,14 @@
 		<div id="dragOverlay"></div>
 		<script>
 		document.querySelector('#dragOverlay').addEventListener('dragenter', function (e) {
-    	e.originalEvent.stopPropagation();
-    	e.originalEvent.preventDefault();
+    	e.stopPropagation();
+    	e.preventDefault();
     	console.log('dragenter');
     	$('body').addClass('dragenter');
 		});
 		document.querySelector('#dragOverlay').addEventListener('dragleave', function (e) {
-    	e.originalEvent.stopPropagation();
-    	e.originalEvent.preventDefault();
+    	e.stopPropagation();
+    	e.preventDefault();
     	console.log('dragleave');
     	document.querySelector('body').removeClass('dragenter');
 		});
