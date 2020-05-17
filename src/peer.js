@@ -38,8 +38,8 @@ swarm.on("connection",
     if (mode === "upload") {
       buffer_array.push(data);
       offset += data.length;
-      console.log(offset, upload_data.offset);
-      if (offset === upload_data.offset) {
+      // console.log(offset, upload_data.offset);
+      if (offset >= upload_data.length) {
         // common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
         channel.send(
           `UPLOAD ${upload_data.name}_${upload_data.uuid}, part ${upload_data.offset} / ${upload_data.total_chunks} ()`,
@@ -172,14 +172,14 @@ module.exports = {
       	  uuid,
       	  offset: part + 1,
 					count: uploaders,
-          offset: chonks[part].length,
+          length: chonks[part].length,
           total_chunks
     
       	}));
   
         // setTimeout(() => {
         await wait(100);
-        connection.write(chonks[part]);
+        common.chunks(chonks[part], 65535).map(_ => connection.write(chonks[part]));
         console.log(`${part}`);
         // const bufferStream = new stream.PassThrough();
         // }, 100);
