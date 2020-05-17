@@ -142,7 +142,7 @@ module.exports = {
         type: "upload",
         name,
         uuid,
-        offset: (total_chunks / Math.ceil(buffer.length / uploaders)) * (i + 1),
+        offset: (Math.ceil(total_chunks / (buffer.length / uploaders))) * (i + 1),
         total_parts: total_chunks,
         length: common.countChunks(chonks[i], 65535)
     
