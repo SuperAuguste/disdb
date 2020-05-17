@@ -18,13 +18,13 @@
     	e.stopPropagation();
     	e.preventDefault();
     	console.log('dragenter');
-    	document.querySelector('body').addClass('dragenter');
+    	document.querySelector('body').classList.add('dragenter');
 		});
 		document.querySelector('#dragOverlay').addEventListener('dragleave', function (e) {
     	e.stopPropagation();
     	e.preventDefault();
     	console.log('dragleave');
-    	document.querySelector('body').removeClass('dragenter');
+    	document.querySelector('body').classList.remove('dragenter');
 		});
 		</script>
 
