@@ -159,7 +159,11 @@ const deleteFile = async (reqFilename, channel) => {
 
 /**
  * Wipes all DisDB files from a discord channel.
+<<<<<<< HEAD
  * @param {Discord.TextChannel} channel 
+=======
+ * @param {Discord.TexChannel} channel 
+>>>>>>> eb3cb389d32b28747530c9dc72522e62be0f2c64
  */
 const deleteAllFiles = async (channel) => {
   const messages = (await channel.messages.fetch()).array();
