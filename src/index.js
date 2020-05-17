@@ -190,7 +190,11 @@ let downloadFn = (req, res) => {
 
 
 const download = async (req, res) => {
-	downloadFn(req, res);
+	try {
+		downloadFn(req, res);
+	} catch {
+		// do nothing
+	}
 };
 
 app.get("/download/:file", download);
