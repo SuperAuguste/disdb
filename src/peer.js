@@ -29,6 +29,7 @@ swarm.on("connection",
   let mode = "normal";
   let peer_id;
 
+  let offset = 0;
   let upload_data = {};
   let buffer_array = [];
 
@@ -36,8 +37,9 @@ swarm.on("connection",
 
     if (mode === "upload") {
       buffer_array.push(data);
-      console.log(buffer_array.length, upload_data.length)
-      if (buffer_array.length === upload_data.length) {
+      offset += data.length;
+      console.log(offset, upload_data.offset);
+      if (offset === upload_data.offset) {
         // common.uploadBuffer(channel, upload_data.name, Buffer.concat(buffer_array), upload_data.uuid, upload_data.offset, data.total_chunks);
         channel.send(
           `UPLOAD ${upload_data.name}_${upload_data.uuid}, part ${upload_data.offset} / ${upload_data.total_chunks} ()`,
@@ -47,6 +49,7 @@ swarm.on("connection",
         );
         mode = "normal";
         buffer_array = [];
+        offset = 0;
         console.log("Normal!!!");
       }
       return;
@@ -160,7 +163,8 @@ module.exports = {
           }
         )
 			} else {
-      	const connection = [...peers.values()][peer_id - 1].connection;
+        const connection = [...peers.values()][peer_id - 1].connection;
+        await wait(100);
       	connection.write(JSON.stringify({
 
       	  type: "upload",
@@ -168,7 +172,7 @@ module.exports = {
       	  uuid,
       	  offset: part + 1,
 					count: uploaders,
-          length: common.countChunks(chonks[part], 65535),
+          offset: chonks[part].length,
           total_chunks
     
       	}));
@@ -176,7 +180,8 @@ module.exports = {
         // setTimeout(() => {
         await wait(100);
         connection.write(chonks[part]);
-        await wait(100);
+        console.log(`${part}`);
+        // const bufferStream = new stream.PassThrough();
         // }, 100);
 
       	// const bufferStream = new stream.PassThrough();
