@@ -111,7 +111,7 @@ const listFiles = async (channel = random_garbage) => {
   let names = new Set();
   let i = 0;
   while (i < messages.length) {
-	const { author, content } = messages[i];
+	const { author, content, id } = messages[i];
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
@@ -123,7 +123,7 @@ const listFiles = async (channel = random_garbage) => {
     if (i === messages.length) {
       i = 0;
       messages = (await channel.messages.fetch({
-        before: m.id
+        before: id
       })).array();
     }
   }
