@@ -49,11 +49,11 @@ swarm.on("connection",
 		try {
 			console.log("ABBA");
 			console.log(data.length);
-			console.log("BAAB"):
+			console.log("BAAB");
 			const message = JSON.parse(data.toString());
 			console.log("ABBA");
 			console.log(data.length);
-			console.log("BAAB"):
+			console.log("BAAB");
 
 			switch (message.type) {
 				case "hello":
