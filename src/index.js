@@ -12,6 +12,8 @@ const Discord = require("discord.js");
 let random_garbage;
 const app = express();
 
+const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+
 app.use(express.static("static"));
 app.use(require("express-fileupload")());
 
@@ -96,7 +98,6 @@ client.on("message", async (message) => {
 
 const linkFiles = async (channel, message) => {
 	const fileNames = await listFiles(channel, message);
-	const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
 	const embedded = new Discord.MessageEmbed();
 	embedded.description = fileNames.length 
 		? fileNames
@@ -212,7 +213,7 @@ app.get("/stream_audio/:file", (req, res) => {
    */
   const vc = random_garbage.guild.channels.cache.array().filter(_ => _.type === "voice").find(_ => _.members.array().find(_ => _.id === owner));
   vc.join().then(conn => {
-    conn.play(`https://disdb.herokuapp.com/download/${encodeURIComponent(req.params.file)}`);
+    conn.play(`${baseUrl}/download/${encodeURIComponent(req.params.file)}`);
     res.redirect("/");
   });
 });
