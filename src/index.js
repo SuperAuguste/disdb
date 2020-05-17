@@ -23,7 +23,7 @@ class Silence extends Readable {
 let random_garbage;
 const app = express();
 
-const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}/`;
+const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
 
 app.use(express.static("static"));
 app.use(require("express-fileupload")());
@@ -107,7 +107,6 @@ client.on("message", async (message) => {
       break;
     case "/list":
       linkFiles(channel, message);
-
       break;
     case "/record start":
       recordAudio(author, channel);
@@ -132,7 +131,6 @@ const finishRecording = async (user, channel = random_garbage) => {
     const { arr, offset, filename, uuid } = userRequestMap[id];
     userRequestMap[id] = undefined;
     await uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset);
-    
   }
 }
 
@@ -236,8 +234,14 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.foo || !req.files.foo.name || !!req.files.foo.data) return;
-  await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
+  if (!req.files.fileList
+			|| req.files.fileList.length === 0) {
+  	res.redirect("/");
+		return;
+	}
+	for (let file of req.files.fileList) {
+  	await uploadBuffer(random_garbage, file.name, file.data);
+	}
   res.redirect("/");
 });
 
@@ -300,7 +304,7 @@ app.get("/stream_audio/:channel/:file", (req, res) => {
   const vc = random_garbage.guild.channels.cache.array().filter(_ => _.type === "voice").find(_ => _.name === req.params.channel);
   
   vc.join().then(conn => {
-    conn.play(`${baseUrl}/download/${encodeURIComponent(req.params.file)}`);
+    conn.play(`${baseUrl}download/${encodeURIComponent(req.params.file)}`);
     res.redirect("/");
   });
 });
