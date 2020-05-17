@@ -325,6 +325,14 @@ const download = async (req, res) => {
 app.get("/download/:file", download);
 app.get("/preview/:file.*", download);
 
+app.get("/show_preview/:file", (req, res) => {
+  /**
+   * @type {Discord.VoiceChannel}
+   */
+	random_garbage.send(`${baseUrl}preview/${encodeURIComponent(req.params.file)}.${req.params.file.split('_')[req.params.file.split('_').length-2]}`);
+  res.redirect("/");
+});
+
 app.get("/stream_audio/:channel/:file", (req, res) => {
   /**
    * @type {Discord.VoiceChannel}
