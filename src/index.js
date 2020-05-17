@@ -149,16 +149,12 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-		console.log("test3");
   if (!req.files.fileList
 			|| req.files.fileList.length === 0) {
-		console.log("test2");
   	res.redirect("/");
 		return;
 	}
-	console.log("test8");
 	for (let file of req.files.fileList) {
-		console.log("test1");
   	await uploadBuffer(random_garbage, file.name, file.data);
 	}
   res.redirect("/");
