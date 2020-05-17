@@ -44,6 +44,8 @@ client.on("ready", () => {
   }
 });
 
+const isClientBot = str => str && str.toUpperCase() === client.user.username.toUpperCase();
+
 client.on("message", async (message) => {
   const { content, channel, author } = message;
   const args = content
@@ -54,19 +56,37 @@ client.on("message", async (message) => {
     case "/delete":
       handleDelete(args[1], message, channel);
       break;
-    case "/upload_testppp":
+    case "/upload_test":
       testUpload(channel);
       break;
     case "/list":
       linkFiles(channel, message);
       break;
     case "/record":
-      handleRecord(args[1], author, channel);
+      if (isClientBot(args[1])) handleRecord(args[2], author, channel);
+      break;
+    case "/play":
+      if (isClientBot(args[1])) handlePlay(args[2], author, message);
       break;
     default:
       break;
   }
 });
+
+/**
+ * @param {string} arg
+ * @param {Discord.Message} message
+ * @param {Discord.TextChannel} channel
+ */
+const handlePlay = async (filename, { id }, message) => {
+  message.channel.guild.channels.cache
+    .array()
+    .filter((c) => c.type === "voice")
+    .find((c) => c.members.map((m) => m.id).includes(id))
+    .join()
+    .then((conn) => conn.play(`${baseUrl}download/${encodeURIComponent(filename)}`));
+  message.reply(`Playing ${filename}! <3`);
+}
 
 const testUpload = async () => {
   const file_data = fs.readFileSync(
