@@ -149,7 +149,7 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/upload", async (req, res) => {
-  if (!req.files.foo || !req.files.foo.name || !!req.files.foo.data) return;
+  if (!req.files.foo || !req.files.foo.name || !req.files.foo.data) return;
   await uploadBuffer(random_garbage, req.files.foo.name, req.files.foo.data);
   res.redirect("/");
 });
