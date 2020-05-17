@@ -1,10 +1,21 @@
 require("dotenv").config();
 
 const fs = require("fs");
+const merge = require("lodash.merge");
 const path = require("path");
 const axios = require("axios").default;
 const express = require("express");
 const Discord = require("discord.js");
+const { Readable } = require('stream');
+
+const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
+
+class Silence extends Readable {
+  _read() {
+    this.push(SILENCE_FRAME);
+    this.destroy();
+  }
+}
 
 /**
  * @type {Discord.TextChannel}
@@ -53,16 +64,14 @@ function assert(cond, err) {
   }
 }
 
-function uploadBuffer(channel, name, buffer) {
+function uploadBuffer(channel, name, buffer, random = Math.random().toString(36).replace("0.", ""), offset = 0) {
   let i = 0;
   const chonks = chunks(buffer, 8388119);
-  const random = Math.random().toString(36).replace("0.", "");
-
   const a = [];
   for (const chunk of chonks) {
     a.push(
       channel.send(
-        `UPLOAD ${name}_${random}, part ${i + 1} / ${chonks.length} (${
+        `UPLOAD ${name}_${random}, part ${i + 1 + offset} / ${chonks.length} (${
           chonks.length - i - 1
         } seconds remaining)`,
         {
@@ -73,37 +82,127 @@ function uploadBuffer(channel, name, buffer) {
 
     i++;
   }
-
-  return Promise.all(a);
+  
+  return {...Promise.all(a), length: a.length};
 }
 
 client.on("message", async (message) => {
-  if (message.content === "/delete") {
-    const messages = (await message.channel.messages.fetch()).array();
+  const {content, channel, author } = message;
 
-    for (const cmessage of messages) {
-      if (cmessage.deletable) cmessage.delete();
-    }
+  switch (content) {
+    case "/delete":
+      const messages = (await channel.messages.fetch()).array();
+      for (const cmessage of messages) {
+        if (cmessage.deletable) cmessage.delete();
+      }
+      message.reply("I oblige, master.");
 
-    message.reply("I oblige, master.");
-  } else if (message.content === "/upload_test") {
-    const file_data = fs.readFileSync(
-      path.join(__dirname, "..", "test", "inkscape.exe")
-    );
-    uploadBuffer(message.channel, "inkscape.exe (Windows)", file_data);
-  } else if (message.content === "/list") {
-		linkFiles(message.channel, message);
+      break;
+    case "/upload_test":
+      const file_data = fs.readFileSync(
+        path.join(__dirname, "..", "test", "inkscape.exe")
+      );
+      uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
+
+      break;
+    case "/list":
+      linkFiles(channel, message);
+      break;
+    case "/record start":
+      recordAudio(author, channel);
+      break;
+    case "/record stop":
+      finishRecording(author, channel);
+      break;
+    default:
+      break;
   }
 });
 
+const userRequestMap = {};
+
+/**
+ * @param {Discord.User} user 
+ * @param {Discord.TextChannel} channel 
+ */
+const finishRecording = async (user, channel = random_garbage) => {
+  const { id } = user;
+  if (userRequestMap[id]) {
+    const { arr, offset, filename, uuid } = userRequestMap[id];
+    userRequestMap[id] = undefined;
+    await uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset);
+  }
+}
+
+/**
+ * @param {Discord.User} user 
+ * @param {Discord.TextChannel} channel 
+ */
+const recordAudio = async (user, channel = random_garbage) => {
+  const { id, username } = user;
+
+  userRequestMap[id] = {
+    arr: [], 
+    offset: 0, 
+    uuid: Math.random().toString(36).replace("0.", ""),
+    filename:`${username}_recording_request.ogg`
+  };
+
+  /**
+   * @type {Discord.VoiceChannel}
+   */
+  const vc = channel.guild.channels.cache.array()
+    .filter(c => c.type === "voice")
+    .find(c => c.members.map(m => m.id).includes(id));
+
+  vc.joinable && vc.join().then(conn => {
+    conn.play(new Silence(), { type: 'opus' });
+    conn.on('speaking', (u, speaking) => {
+
+      if (speaking) {
+        const stream = conn.receiver.createStream(u, {mode: "opus"});
+        /**
+         * @type {Buffer[]}
+         */
+        const arr = userRequestMap[id].arr;
+        let { offset, uuid, filename } = userRequestMap[id];
+
+        stream.on('data', chunk => arr.push(chunk));
+
+        stream.on('end', () => {
+          if (arr.reduce((curr, b) => curr + b.byteLength, 0) >= 8388119) {
+            offset += uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset).length;
+            if (userRequestMap[id]) merge(userRequestMap[id], { offset, arr: [] });
+          }
+        }) 
+      }
+    })
+  });
+}
+
+
 const linkFiles = async (channel, message) => {
 	const fileNames = await listFiles(channel, message);
-	const embedded = new Discord.MessageEmbed();
-	embedded.description = fileNames.length 
-		? fileNames
-			.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}download/${encodeURIComponent(n)})`)
-			.join("\n")
-		: "Unable to find any uploaded files!";
+  let description;
+  if (fileNames.length) {
+    const fileLinks = fileNames.map(n => `[${n.substring(0, n.lastIndexOf("_"))}](${baseUrl}download/${encodeURIComponent(n)})`)
+    const descriptions = fileLinks.reduce((curr, l) => {
+      const last = curr.pop();
+      if (last.length + l.length + 1 >= 2048) {
+        curr.push(last, l);
+      } else {
+        curr.push(`${last}${last ? '\n' : ''}${l}`)
+      }
+      return curr;
+    }, ['']);
+    for (const description of descriptions) {
+      await message.reply(new Discord.MessageEmbed({description}))
+    }
+  } else {
+    message.reply(new Discord.MessageEmbed({description: "Unable to find any uploaded files!"}))
+  }
+  
+	embedded.description = description;
 	message.reply(embedded);
 }
 
@@ -116,7 +215,7 @@ const listFiles = async (channel = random_garbage) => {
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (author.bot && content.indexOf("UPLOAD") > -1) {
       const { filename, partNo, totalParts } = parseMessageContent(content);
-	  if (partNo === totalParts) names.add(filename);
+	    if (partNo === totalParts) names.add(filename);
     }
 
 	i++;
