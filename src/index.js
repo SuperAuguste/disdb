@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const fs = require("fs");
+const merge = require("lodash.merge");
 const path = require("path");
 const axios = require("axios").default;
 const express = require("express");
@@ -108,8 +109,11 @@ client.on("message", async (message) => {
       linkFiles(channel, message);
 
       break;
-    case "/record":
+    case "/record start":
       recordAudio(author, channel);
+      break;
+    case "/record stop":
+      finishRecording(author, channel);
       break;
     default:
       break;
@@ -120,18 +124,31 @@ const userRequestMap = {};
 
 /**
  * @param {Discord.User} user 
- * @param {Discord.VoiceChannel} channel 
+ * @param {Discord.TextChannel} channel 
+ */
+const finishRecording = async (user, channel = random_garbage) => {
+  const { id } = user;
+  if (userRequestMap[id]) {
+    const { arr, offset, filename, uuid } = userRequestMap[id];
+    userRequestMap[id] = undefined;
+    await uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset);
+    
+  }
+}
+
+/**
+ * @param {Discord.User} user 
+ * @param {Discord.TextChannel} channel 
  */
 const recordAudio = async (user, channel = random_garbage) => {
-  const uuid = Math.random().toString(36).replace("0.", "");
   const { id, username } = user;
-  const { [id]: userArr } = userRequestMap;
 
-  if (!userArr) {
-    userArr = [];
-    userRequestMap[id] = userArr;
-  }
-
+  userRequestMap[id] = {
+    arr: [], 
+    offset: 0, 
+    uuid: Math.random().toString(36).replace("0.", ""),
+    filename:`${username}_recording_request.ogg`
+  };
 
   /**
    * @type {Discord.VoiceChannel}
@@ -139,18 +156,27 @@ const recordAudio = async (user, channel = random_garbage) => {
   const vc = channel.guild.channels.cache.array()
     .filter(c => c.type === "voice")
     .find(c => c.members.map(m => m.id).includes(id));
-  let offset = 0;
 
   vc.joinable && vc.join().then(conn => {
     conn.play(new Silence(), { type: 'opus' });
-    
     conn.on('speaking', (u, speaking) => {
+
       if (speaking) {
         const stream = conn.receiver.createStream(u, {mode: "opus"});
-        stream.on('data', chunk => parts.push(chunk));
+        /**
+         * @type {Buffer[]}
+         */
+        const arr = userRequestMap[id].arr;
+        let { offset, uuid, filename } = userRequestMap[id];
+
+        stream.on('data', chunk => arr.push(chunk));
+
         stream.on('end', () => {
-          offset += uploadBuffer(channel, `${username}_recording_request.ogg`, Buffer.concat(parts), uuid, offset).length;
-        });
+          if (arr.reduce((curr, b) => curr + b.byteLength, 0) >= 8388119) {
+            offset += uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset).length;
+            if (userRequestMap[id]) merge(userRequestMap[id], { offset, arr: [] });
+          }
+        }) 
       }
     })
   });
