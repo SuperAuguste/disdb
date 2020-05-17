@@ -46,10 +46,15 @@ swarm.on("connection",
       return;
     }
 
-		console.log(data.toString());
-		const message = JSON.parse(data.toString());
-
 		try {
+			console.log("ABBA");
+			console.log(data.length);
+			console.log("BAAB"):
+			const message = JSON.parse(data.toString());
+			console.log("ABBA");
+			console.log(data.length);
+			console.log("BAAB"):
+
 			switch (message.type) {
 				case "hello":
     	    peer_id = message.peer_id;
