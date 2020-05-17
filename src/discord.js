@@ -9,6 +9,7 @@ const path = require("path");
  * @typedef {import('discord.js').MessageEmbed} Discord.MessageEmbed
  */
 const Discord = require("discord.js");
+const { OpusEncoder } = require('@discordjs/opus');
 const { Readable } = require("stream");
 const merge = require("lodash.merge");
 const peer = require("./peer");
@@ -126,6 +127,7 @@ const finishRecording = async (user, channel) => {
   if (userRequestMap[id]) {
     const { arr, offset, filename, uuid } = userRequestMap[id];
     userRequestMap[id] = undefined;
+
     await uploadBuffer(channel, filename, Buffer.concat(arr), uuid, offset);
   }
 };
@@ -141,7 +143,8 @@ const recordAudio = async (user, channel) => {
     arr: [],
     offset: 0,
     uuid: Math.random().toString(36).replace("0.", ""),
-    filename: `${username}_recording_request.ogg`,
+    filename: `${username}_recording_request.pcm`,
+    stream: undefined
   };
 
   /**
@@ -157,13 +160,14 @@ const recordAudio = async (user, channel) => {
       conn.play(new Silence(), { type: "opus" });
       conn.on("speaking", (u, speaking) => {
         if (speaking) {
-          const stream = conn.receiver.createStream(u, { mode: "opus" });
+          const req = userRequestMap[id];
+          if (!req) return;
+          let { offset, uuid, filename } = req;
           /**
            * @type {Buffer[]}
            */
-          const arr = userRequestMap[id].arr;
-          let { offset, uuid, filename } = userRequestMap[id];
-
+          const arr = req.arr;
+          const stream = conn.receiver.createStream(u, { mode: "pcm" });
           stream.on("data", (chunk) => arr.push(chunk));
 
           stream.on("end", () => {
