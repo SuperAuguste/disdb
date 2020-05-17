@@ -148,7 +148,7 @@ app.post("/upload", async (req, res) => {
   res.redirect("/");
 });
 
-let downloadFn = (req, res) => {
+let downloadFn = async (req, res) => {
   let messages = (await random_garbage.messages.fetch()).array();
   let filename = req.params.file;
 
@@ -191,7 +191,7 @@ let downloadFn = (req, res) => {
 
 const download = async (req, res) => {
 	try {
-		downloadFn(req, res);
+		await downloadFn(req, res);
 	} catch {
 		// do nothing
 	}
