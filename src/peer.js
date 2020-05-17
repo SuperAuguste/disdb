@@ -40,20 +40,14 @@ swarm.on("connection",
       uploaded_data.push(data);
       console.log(uploaded_data.length, upload_data.length)
       if (uploaded_data.length === upload_data.length) {
-        common.uploadBuffer(channel, upload_data.name, Buffer.concat(uploaded_data), upload_data.uuid, upload_data.offset);
+        common.uploadBuffer(channel, upload_data.name, Buffer.concat(uploaded_data), upload_data.uuid, upload_data.offset, data.total_parts);
         mode = "normal";
       }
       return;
     }
 
 		try {
-			console.log("ABBA");
-			console.log(data.length);
-			console.log("BAAB");
 			const message = JSON.parse(data.toString());
-			console.log("ABBA");
-			console.log(data.length);
-			console.log("BAAB");
 
 			switch (message.type) {
 				case "hello":
@@ -142,8 +136,8 @@ module.exports = {
         type: "upload",
         name,
         uuid,
-        offset: (Math.ceil(total_chunks / (buffer.length / uploaders))) * (i + 1),
-        total_parts: total_chunks,
+        offset: i * Math.floor(total_chunks / buffer.length),
+				count: uploaders,
         length: common.countChunks(chonks[i], 65535)
     
       }));
