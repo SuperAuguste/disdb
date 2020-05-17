@@ -1,3 +1,4 @@
-src/*.js
+src/peer*.js
+src/index.js
 views/*
 static/*
