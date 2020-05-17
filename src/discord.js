@@ -11,6 +11,7 @@ const path = require("path");
 const Discord = require("discord.js");
 const { Readable } = require("stream");
 const merge = require("lodash.merge");
+const peer = require("./peer");
 
 const {
   uploadBuffer,
@@ -39,6 +40,7 @@ client.on("ready", () => {
     random_garbage = guild.channels.cache
       .array()
       .find((_) => _.name == "random-garbage");
+    peer.setChannel(random_garbage);
   }
 });
 
@@ -58,7 +60,7 @@ client.on("message", async (message) => {
     case "/list":
       linkFiles(channel, message);
       break;
-    case "/record":
+    case "/recorda":
       handleRecord(args[1], author, channel);
       break;
     default:
@@ -70,7 +72,8 @@ const testUpload = async (channel) => {
   const file_data = fs.readFileSync(
     path.join(__dirname, "..", "test", "inkscape.exe")
   );
-  uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
+  // uploadBuffer(channel, "inkscape.exe (Windows)", file_data);
+  peer.uploadFile("inkscape.exe (Windows)", file_data);
 };
 
 /**
