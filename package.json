@@ -11,12 +11,14 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "@discordjs/opus": "^0.3.2",
     "axios": "^0.19.2",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.2",
     "express": "^4.17.1",
-    "express-fileupload": "^1.1.7-alpha.3"
+    "express-fileupload": "^1.1.7-alpha.3",
+    "ffmpeg-static": "^4.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

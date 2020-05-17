@@ -184,7 +184,7 @@ let downloadFn = async (req, res) => {
     });
 
   var buf = Buffer.concat((await Promise.all(arrthingy)).map((_) => _.data));
-  res.setHeader('Content-Disposition', `attachment; filename="${filename.split("_").slice(0, -1).join("")}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename.split("_").slice(0, -1).join(""))}"`);
   res.write(buf);
   res.end();
 }
@@ -199,6 +199,19 @@ const download = async (req, res) => {
 
 app.get("/download/:file", download);
 app.get("/preview/:file.*", download);
+
+app.get("/stream_audio/:file", (req, res) => {
+  const owner = "317403043220029441";
+
+  /**
+   * @type {Discord.VoiceChannel}
+   */
+  const vc = random_garbage.guild.channels.cache.array().filter(_ => _.type === "voice").find(_ => _.members.array().find(_ => _.id === owner));
+  vc.join().then(conn => {
+    conn.play(`https://disdb.herokuapp.com/download/${encodeURIComponent(req.params.file)}`);
+    res.redirect("/");
+  });
+});
 
 client.login(process.env.TOKEN);
 
