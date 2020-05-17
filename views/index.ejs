@@ -52,14 +52,14 @@
               >
                 Play
               </button>
-              <button
+              <!-- <button
                 href="#"
                 onclick="location.replace(`/preview/<%- encodeURIComponent(file) %>`);"
               >
                 Show
-              </button>
-              <button href="/download/<%- file %>">Download</button>
-              <button onclick="location.replace(`/delete/<%- file %>`)">Delete</button>
+              </button> -->
+              <a class="btn" href="/download/<%- file %>">Download</a>
+              <button onclick="location.replace(`/delete/<%- encodeURIComponent(file) %>`)">Delete</button>
             </div>
           </div>
 

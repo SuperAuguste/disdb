@@ -15,6 +15,7 @@ body {
   font-family: "Inter";
   overflow: hidden;
 
+  color: black;
   transition: 0.1s backgroud-color, 0.1s color;
 }
 
@@ -49,8 +50,12 @@ main > *:last-child {
   margin-bottom: 10px;
 }
 
+.controls {
+  margin-top: 10px;
+}
+
 #files a {
-  color: #4263eb;
+  /* color: #4263eb; */
 }
 
 #dragMessage {
@@ -111,16 +116,16 @@ h1 {
   background-color: black;
 }
 
-#foo {
+#fileList {
   width: 250px;
   height: 250px;
 
-  background-color: rgb(220, 220, 220);
+  background-color: rgb(241, 241, 241);
 
   outline: none;
 }
 
-#foo.drag {
+#fileList.drag {
   position: fixed;
 
   top: 0;
@@ -128,4 +133,18 @@ h1 {
 
   width: 100%;
   height: 100%;
+}
+
+button, .btn {
+  border: 1px solid currentColor;
+
+  padding: 10px 15px;
+
+  color: inherit;
+  font-size: 8pt;
+  font-family: "Inter";
+  text-decoration: none;
+
+  cursor: pointer;
+  background: none;
 }
