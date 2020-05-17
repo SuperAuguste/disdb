@@ -20,7 +20,10 @@ const {
   deleteAllFiles,
 } = require("./common");
 
-const client = new Discord.Client();
+const client = new Discord.Client({
+  restRequestTimeout: 600000,
+  retryLimit: 10
+});
 
 /**
  * @type {Discord.TextChannel}
@@ -82,8 +85,7 @@ const handleDelete = async (arg, message, channel) => {
       message.reply("Deleted all files, my sir.");
       break;
     default:
-      deleteFile(arg, channel);
-      message.reply(`Deleted (or tried to delete) ${arg}.`);
+      message.reply(await deleteFile(arg, channel) ? `Deleted ${arg}.` : `Unable to delete ${arg}.`);
       break;
   }
 };

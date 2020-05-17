@@ -3,7 +3,6 @@ const axios = require("axios");
 /**
  * @typedef {import('discord.js').VoiceChannel} Discord.VoiceChannel
  */
-
 const { uploadBuffer, baseUrl } = require("./common");
 const { getDefaultChannel } = require("./discord");
 

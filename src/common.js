@@ -1,5 +1,6 @@
 /**
  * @typedef {import('discord.js').TextChannel} Discord.TextChannel
+ * @typedef {import('discord.js').Message} Discord.Message
  */
 
 const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
@@ -133,14 +134,17 @@ const listFiles = async (channel) => {
  * The filename must match a <NAME>.<EXTENSION>_<UUID> format.
  * @param {string} filename
  * @param {Discord.TextChannel} channel 
+ * @returns {boolean} if the file was deleted or not
  */
 const deleteFile = async (reqFilename, channel) => {
-  console.log(reqFilename);
   let messages = (await channel.messages.fetch()).array();
-  console.log("Deleting file...", reqFilename);
-
-  while (messages.length) {
-    const m = messages.pop();
+  /**
+   * @type {Discord.Message[]}
+   */
+  const toDelete = [];
+  let i = 0;
+  while (i < messages.length) {
+    const m = messages[i];
     const {
       author: { bot },
       content,
@@ -150,20 +154,28 @@ const deleteFile = async (reqFilename, channel) => {
     if (content.indexOf("-- INTERRUPT --") > -1) break;
     if (bot && deletable && content.indexOf("UPLOAD") > -1) {
       const { filename: msgFilename } = parseMessageContent(content);
-      if (reqFilename === msgFilename) m.delete();
+      if (reqFilename === msgFilename) toDelete.push(m);
     }
-    if (!messages.length)
-      messages = (await channel.messages.fetch({ before: id })).array();
+    
+    i++;
+
+    if (i === messages.length) {
+      i = 0;
+      messages = (
+        await channel.messages.fetch({
+          before: id,
+        })
+      ).array();
+      console.log(id);
+    }
   }
-};
+  channel.bulkDelete(toDelete);
+  return toDelete.length > 0;
+}; 
 
 /**
  * Wipes all DisDB files from a discord channel.
-<<<<<<< HEAD
  * @param {Discord.TextChannel} channel 
-=======
- * @param {Discord.TexChannel} channel 
->>>>>>> eb3cb389d32b28747530c9dc72522e62be0f2c64
  */
 const deleteAllFiles = async (channel) => {
   const messages = (await channel.messages.fetch()).array();

@@ -18,7 +18,7 @@ app.get("/", async (req, res) => {
 app.post("/upload", uploadHandler);
 app.get("/download/:file", downloadHandler);
 app.get("/preview/:file.*", downloadHandler);
-app.get("/delete/:file", req => deleteFile(req.params.file, getDefaultChannel()));
+app.get("/delete/:file", async req => deleteFile(req.params.file, getDefaultChannel()));
 app.get("/stream_audio/:channel/:file", streamHandler);
 
 client.login(process.env.TOKEN);
