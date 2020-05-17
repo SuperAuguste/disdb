@@ -8,6 +8,9 @@
     "start": "node src/index.js"
   },
   "author": "SuperAuguste <auguste.rame@gmail.com>",
+  "contributors": [
+    "mebird <mbe_pro@outlook.com>"
+  ],
   "license": "MIT",
   "private": false,
   "dependencies": {
@@ -20,7 +23,8 @@
     "express-fileupload": "^1.1.7-alpha.3",
     "ffmpeg-static": "^4.2.1",
     "hyperswarm": "^2.14.0",
-    "lodash.merge": "^4.6.2"
+    "lodash.merge": "^4.6.2",
+    "wav-converter": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^7.0.0",
