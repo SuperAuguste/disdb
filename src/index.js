@@ -300,6 +300,22 @@ let downloadFn = async (req, res) => {
   res.end();
 }
 
+const deleteFile = async (req, res) => {
+  let messages = (await random_garbage.messages.fetch()).array();
+  const reqFilename = req.params.file;
+
+  while (messages.length) {
+    const m, {author: { bot }, content, deletable, id} = messages.pop();
+    if (bot 
+        && deletable
+        && content.indexOf("UPLOAD") > -1) {
+        const { filename: msgFilename } = parseMessageContent(content);
+        if (reqFilename === msgFilename) m.delete();
+    }
+    if (!messages.length) messages = (await random_garbage.messages.fetch()).array();  
+  }
+}
+
 const download = async (req, res) => {
 	try {
 		await downloadFn(req, res);
@@ -310,6 +326,7 @@ const download = async (req, res) => {
 
 app.get("/download/:file", download);
 app.get("/preview/:file.*", download);
+app.get("/delete/:file", deleteFile);
 
 app.get("/stream_audio/:channel/:file", (req, res) => {
   /**

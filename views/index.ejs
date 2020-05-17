@@ -1,124 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Upload</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload</title>
 
-	<link rel="stylesheet" href="/app.css">
+    <link rel="stylesheet" href="/app.css" />
 
-	<style id="dark"></style>
-</head>
-<body>
-	
-	<main>
+    <style id="dark"></style>
+  </head>
+  <body>
+    <main>
+      <div id="dragMessage">Drop a File to Upload</div>
+      <div id="dragOverlay"></div>
+      <script>
+        document
+          .querySelector("#dragOverlay")
+          .addEventListener("dragenter", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log("dragenter");
+            document.querySelector("body").classList.add("dragenter");
+          });
+        document
+          .querySelector("#dragOverlay")
+          .addEventListener("dragleave", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log("dragleave");
+            document.querySelector("body").classList.remove("dragenter");
+          });
+      </script>
 
-		<div id="dragMessage">Drop a File to Upload</div>
-		<div id="dragOverlay"></div>
-		<script>
-		document.querySelector('#dragOverlay').addEventListener('dragenter', function (e) {
-    	e.stopPropagation();
-    	e.preventDefault();
-    	console.log('dragenter');
-    	document.querySelector('body').classList.add('dragenter');
-		});
-		document.querySelector('#dragOverlay').addEventListener('dragleave', function (e) {
-    	e.stopPropagation();
-    	e.preventDefault();
-    	console.log('dragleave');
-    	document.querySelector('body').classList.remove('dragenter');
-		});
-		</script>
+      <div id="list">
+        <h1>Files</h1>
 
-		<div id="list">
+        <div id="files">
+          <% for (const file of files) { %>
 
-			<h1>Files</h1>
-			
-			<div id="files">
-				<% for (const file of files) { %>
-		
-					<div>
-					
-						<span><%- file.split("_").slice(0, -1).join("") %></span> <span style="float: right;"> (<%- file.split("_").slice(-1) %>)</span>
+          <div>
+            <span><%- file.split("_").slice(0, -1).join("") %></span>
+            <span style="float: right;">
+              (<%- file.split("_").slice(-1) %>)</span
+            >
 
-						<div class="controls">
+            <div class="controls">
+              <a
+                href="#"
+                onclick="location.replace(`/stream_audio/${prompt('Channel name! (without #)')}/<%- encodeURIComponent(file) %>`);"
+                >Play</a
+              >
+              <a href="/download/<%- file %>">Download</a>
+              <a href="/delete/<%- file %>">Delete</a>
+            </div>
+          </div>
 
-							<a href="#" onclick="location.replace(`/stream_audio/${prompt('Channel name! (without #)')}/<%- encodeURIComponent(file) %>`);">Play</a>
-							<a href="/download/<%- file %>">Download</a>
+          <% } %>
+        </div>
+      </div>
 
-						</div>
+      <div id="upload">
+        <h1>Upload</h1>
 
-					</div>
-		
-				<% } %>
-			</div>
-	
-		</div>
-	
-		<div id="upload">
-	
-			<h1>Upload</h1>
-	
-			<p>Upload files to Discord below! Please make sure that the files don't contain any private info!</p>
-	
-			<form ref='uploadForm' 
-			id='uploadForm' 
-			action='/upload' 
-			method='post' 
-			encType="multipart/form-data">
-				<input type="file" name="fileList" id="fileList" multiple>
-				<input type='submit' value='Upload!'>
-			</form>
-	
-		</div>
+        <p>
+          Upload files to Discord below! Please make sure that the files don't
+          contain any private info!
+        </p>
 
-	</main>
+        <form
+          ref="uploadForm"
+          id="uploadForm"
+          action="/upload"
+          method="post"
+          encType="multipart/form-data"
+        >
+          <input type="file" name="fileList" id="fileList" multiple />
+          <input type="submit" value="Upload!" />
+        </form>
+      </div>
+    </main>
 
-	<div id="toggle">
-		<img id="toggler" src="moon.svg">
-	</div>
+    <div id="toggle">
+      <img id="toggler" src="moon.svg" />
+    </div>
 
-	<script>
+    <script>
+      let cooldown;
 
-		let cooldown;
-
-		document.getElementById("toggle").addEventListener("click", () => {
-			const dark = document.getElementById("dark");
-			if (!dark.innerHTML.length) {
-				dark.innerHTML = `html, body {
+      document.getElementById("toggle").addEventListener("click", () => {
+        const dark = document.getElementById("dark");
+        if (!dark.innerHTML.length) {
+          dark.innerHTML = `html, body {
 			color: rgb(190, 190, 190);
 			background-color: black;
 			}`;
-			document.getElementById("toggle").style.backgroundColor = "white";
-			document.getElementById("toggler").src = "sun.svg";
-			} else {
-				dark.innerHTML = "";
-				document.getElementById("toggle").style.backgroundColor = "black";
-				document.getElementById("toggler").src = "moon.svg";
-			}
-		});
+          document.getElementById("toggle").style.backgroundColor = "white";
+          document.getElementById("toggler").src = "sun.svg";
+        } else {
+          dark.innerHTML = "";
+          document.getElementById("toggle").style.backgroundColor = "black";
+          document.getElementById("toggler").src = "moon.svg";
+        }
+      });
 
-		document.addEventListener("dragover", () => {
-			document.getElementById("foo").classList.add("drag");
-		});
+      document.addEventListener("dragover", () => {
+        document.getElementById("foo").classList.add("drag");
+      });
 
-		document.addEventListener("dragend", () => {
-			document.getElementById("foo").classList.remove("drag");
-		});
+      document.addEventListener("dragend", () => {
+        document.getElementById("foo").classList.remove("drag");
+      });
 
-		document.addEventListener("dragleave", event => {
-			if (cooldown) clearTimeout(cooldown);
-			cooldown = setTimeout(() => {
-				document.getElementById("foo").classList.remove("drag");
-				cooldown = undefined;
-			}, 1000);
-		});
+      document.addEventListener("dragleave", (event) => {
+        if (cooldown) clearTimeout(cooldown);
+        cooldown = setTimeout(() => {
+          document.getElementById("foo").classList.remove("drag");
+          cooldown = undefined;
+        }, 1000);
+      });
 
-		document.addEventListener("drop", () => {
-			document.getElementById("foo").classList.remove("drag");
-		});
-
-	</script>
-
-</body>
+      document.addEventListener("drop", () => {
+        document.getElementById("foo").classList.remove("drag");
+      });
+    </script>
+  </body>
 </html>
