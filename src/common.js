@@ -166,7 +166,6 @@ const deleteFile = async (reqFilename, channel) => {
           before: id,
         })
       ).array();
-      console.log(id);
     }
   }
   channel.bulkDelete(toDelete);
