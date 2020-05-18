@@ -90,10 +90,10 @@ const previewHandler = async (req, res) => {
   try {
 		let fileSplit = req.params.file.split("_");
     getDefaultChannel().send(
-      `${baseUrl}preview/${encodeURIComponent(req.params.file)}.png`
-			//${
-      //  fileSplit[fileSplit.length - 2]
-      //}`
+      `${baseUrl}preview/${encodeURIComponent(req.params.file)}.
+			${
+        fileSplit[fileSplit.length - 2]
+      }`
     );
     res.redirect("/");
   } catch {
