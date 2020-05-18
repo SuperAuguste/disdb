@@ -88,10 +88,12 @@ const downloadHandler = async (req, res) => {
 
 const previewHandler = async (req, res) => {
   try {
+		let fileSplit = req.params.file.split("_");
     getDefaultChannel().send(
-      `${baseUrl}preview/${encodeURIComponent(req.params.file)}.${
-        req.params.file.split("_")[req.params.file.split("_").length - 2]
-      }`
+      `${baseUrl}preview/${encodeURIComponent(req.params.file)}.png`
+			//${
+      //  fileSplit[fileSplit.length - 2]
+      //}`
     );
     res.redirect("/");
   } catch {
