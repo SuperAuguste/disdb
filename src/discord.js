@@ -11,7 +11,7 @@ const path = require("path");
 const Discord = require("discord.js");
 const { Readable } = require("stream");
 const { encodeWav: encodeWavHelper } = require("wav-converter");
-const peer = require("./peer");
+// const peer = require("./peer");
 
 const {
   uploadBuffer,
@@ -57,7 +57,7 @@ client.on("message", async (message) => {
     case "/delete":
       handleDelete(args.slice(1).join(" "), message, channel);
       break;
-    case "/upload_test":
+    case "/upload_testppp":
       testUpload(channel);
       break;
     case "/list":
